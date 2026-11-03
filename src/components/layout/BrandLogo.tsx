@@ -5,17 +5,20 @@ import { BYTE_BRAND } from '../../styles/tokens';
 export interface BrandLogoProps {
   tone?: 'light' | 'dark';
   showLocation?: boolean;
+  priority?: boolean;
   className?: string;
 }
 
 /**
  * Reusable Byte Technology Brand Lockup.
- * Uses the official uploaded logo asset (/assets/aistudio/byte_logo_2939abed.jpeg)
- * with an inline architectural SVG fallback if the image ever fails to load.
+ * Uses responsive WebP sources (1.2 KB 1x / 1.7 KB 2x) with fallback to the official
+ * logo asset (/assets/aistudio/byte_logo_2939abed.jpeg) and explicit 36x36 dimensions
+ * to guarantee zero Cumulative Layout Shift (CLS = 0).
  */
 export function BrandLogo({
   tone = 'light',
   showLocation = true,
+  priority = false,
   className,
 }: BrandLogoProps) {
   const [imageError, setImageError] = React.useState(false);
@@ -31,12 +34,23 @@ export function BrandLogo({
         )}
       >
         {!imageError ? (
-          <img
-            src={BYTE_BRAND.logoPath}
-            alt={`${BYTE_BRAND.name} official logo`}
-            className="h-full w-full object-cover scale-125"
-            onError={() => setImageError(true)}
-          />
+          <picture className="h-full w-full">
+            <source
+              type="image/webp"
+              srcSet="/assets/aistudio/byte_logo_72.webp 1x, /assets/aistudio/byte_logo_144.webp 2x"
+            />
+            <img
+              src={BYTE_BRAND.logoPath}
+              alt={`${BYTE_BRAND.name} — Official Modular B Brand Logo`}
+              width={36}
+              height={36}
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'auto'}
+              decoding="async"
+              className="h-full w-full object-cover"
+              onError={() => setImageError(true)}
+            />
+          </picture>
         ) : (
           <svg
             aria-hidden="true"
@@ -69,7 +83,7 @@ export function BrandLogo({
           <span
             className={cn(
               'mt-1 text-[11px] font-medium leading-none',
-              tone === 'light' ? 'text-[#687285]' : 'text-[#8490A5]'
+              tone === 'light' ? 'text-[#525B6C]' : 'text-[#9BA6B8]'
             )}
           >
             {BYTE_BRAND.location}
@@ -79,3 +93,4 @@ export function BrandLogo({
     </div>
   );
 }
+

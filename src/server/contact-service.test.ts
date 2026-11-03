@@ -1,9 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  isResendConfigured,
+  createContactRateLimiter,
   escapeHtml,
+  getSecurityHeaders,
+  isResendConfigured,
   processContactEnquiry,
+  sanitizeSingleLineInput,
 } from './contact-service';
 
 describe('Server-Side Contact & Resend Email Service (src/server/contact-service.ts)', () => {
@@ -20,6 +23,49 @@ describe('Server-Side Contact & Resend Email Service (src/server/contact-service
       escapeHtml(unsafe),
       '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp; &#39;quote&#39;'
     );
+  });
+
+  it('strips CRLF and null characters from single-line header fields to prevent header injection', () => {
+    const malicious = 'Abebe\r\nBcc: attacker@example.com\0';
+    assert.equal(
+      sanitizeSingleLineInput(malicious, 120),
+      'Abebe Bcc: attacker@example.com '
+    );
+  });
+
+  it('returns standard HTTP security headers while preserving iframe compatibility', () => {
+    const headers = getSecurityHeaders();
+    assert.equal(headers['X-Content-Type-Options'], 'nosniff');
+    assert.equal(headers['Referrer-Policy'], 'strict-origin-when-cross-origin');
+    assert.equal(headers['X-Permitted-Cross-Domain-Policies'], 'none');
+    assert.ok(headers['Permissions-Policy']?.includes('camera=()'));
+    assert.equal(headers['X-Frame-Options'], undefined);
+  });
+
+  it('enforces per-IP sliding-window rate limiting and resets after the window expires', () => {
+    const limiter = createContactRateLimiter({ windowMs: 60_000, maxRequests: 2 });
+    const t0 = 1_700_000_000_000;
+
+    const r1 = limiter.check('203.0.113.10', t0);
+    assert.equal(r1.allowed, true);
+    assert.equal(r1.remaining, 1);
+
+    const r2 = limiter.check('203.0.113.10', t0 + 1_000);
+    assert.equal(r2.allowed, true);
+    assert.equal(r2.remaining, 0);
+
+    const r3 = limiter.check('203.0.113.10', t0 + 2_000);
+    assert.equal(r3.allowed, false);
+    assert.equal(r3.remaining, 0);
+    assert.equal(r3.retryAfterSeconds, 58);
+
+    // Independent client IP is not blocked
+    const otherIp = limiter.check('203.0.113.99', t0 + 2_000);
+    assert.equal(otherIp.allowed, true);
+
+    // Original client IP is allowed again once the window expires
+    const afterExpiry = limiter.check('203.0.113.10', t0 + 61_000);
+    assert.equal(afterExpiry.allowed, true);
   });
 
   it('rejects invalid payloads and honeypot spam submissions with 400 status', async () => {
@@ -146,3 +192,4 @@ describe('Server-Side Contact & Resend Email Service (src/server/contact-service
     assert.ok(result.formattedBrief?.mailtoHref.startsWith('mailto:ayanadamtew@gmail.com'));
   });
 });
+

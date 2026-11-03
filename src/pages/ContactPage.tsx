@@ -155,7 +155,7 @@ export function ContactPage() {
 
       const data = await response.json().catch(() => null);
 
-      if (!response.ok && response.status === 400) {
+      if (!response.ok && (response.status === 400 || response.status === 429)) {
         if (data?.errors) {
           setErrors(data.errors);
         }
@@ -270,7 +270,7 @@ export function ContactPage() {
             <Card surface="pure" radius="lg" padding="default" className="relative">
               <GridCrosshair className="absolute top-3.5 right-3.5" tone="light" />
               <div className="space-y-4">
-                <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                <span className="font-mono text-xs font-semibold text-[#9A3412]">
                   DIRECT EXECUTIVE CONTACT IN ETHIOPIA
                 </span>
                 <h2 className="font-display text-xl font-bold text-[#1A2130]">
@@ -280,13 +280,13 @@ export function ContactPage() {
                 <div className="space-y-3 border-t border-[#DFDFD9] pt-4 text-sm">
                   <div className="flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-2 text-[#4A5365]">
-                      <Mail className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
+                      <Mail className="h-4 w-4 text-[#B45309]" aria-hidden="true" />
                       <span>Electronic Mail</span>
                     </span>
                     <div className="flex items-center gap-2">
                       <a
                         href={`mailto:${BYTE_BRAND.email}`}
-                        className="font-mono text-xs font-semibold text-[#1A2130] hover:text-[#FA8112] underline-offset-4 hover:underline"
+                        className="font-mono text-xs font-semibold text-[#1A2130] hover:text-[#B45309] underline-offset-4 hover:underline"
                       >
                         {BYTE_BRAND.email}
                       </a>
@@ -312,7 +312,7 @@ export function ContactPage() {
 
                   <div className="flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-2 text-[#4A5365]">
-                      <MapPin className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
+                      <MapPin className="h-4 w-4 text-[#B45309]" aria-hidden="true" />
                       <span>Location</span>
                     </span>
                     <span className="font-semibold text-[#1A2130]">
@@ -322,10 +322,10 @@ export function ContactPage() {
                 </div>
 
                 <div className="space-y-2 border-t border-[#DFDFD9] pt-3">
-                  <p className="rounded border border-dashed border-[#1A2130]/25 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#687285]">
+                  <p className="rounded border border-dashed border-[#1A2130]/25 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#525B6C]">
                     [CONTENT PLACEHOLDER: Official Office Address in Ethiopia — e.g., City / District / Building]
                   </p>
-                  <p className="rounded border border-dashed border-[#1A2130]/25 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#687285]">
+                  <p className="rounded border border-dashed border-[#1A2130]/25 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#525B6C]">
                     [CONTENT PLACEHOLDER: Official Business Phone / WhatsApp / Telegram Contact Number]
                   </p>
                 </div>
@@ -362,7 +362,7 @@ export function ContactPage() {
                 <Label asChild>
                   <legend className="text-base font-display font-bold text-[#1A2130]">
                     1. Select Capabilities Needed{' '}
-                    <span className="font-mono text-xs font-normal text-[#687285]">
+                    <span className="font-mono text-xs font-normal text-[#525B6C]">
                       (Select all that apply)
                     </span>
                   </legend>
@@ -391,8 +391,8 @@ export function ContactPage() {
                         <span>
                           <span
                             className={cn(
-                              'font-mono mr-2',
-                              isSelected ? 'text-[#FDA63A]' : 'text-[#FA8112]'
+                              'font-mono font-semibold mr-2',
+                              isSelected ? 'text-[#FDA63A]' : 'text-[#B45309]'
                             )}
                           >
                             {service.index}.
@@ -417,6 +417,7 @@ export function ContactPage() {
 
                 {errors.selectedServiceIds && (
                   <p
+                    id="selected-services-error"
                     role="alert"
                     className="flex items-center gap-1.5 text-xs font-medium text-[#B91C1C]"
                   >
@@ -433,6 +434,7 @@ export function ContactPage() {
                   <Input
                     id="sender-name"
                     name="senderName"
+                    autoComplete="name"
                     value={senderName}
                     onChange={(e) => {
                       setSenderName(e.target.value);
@@ -442,9 +444,11 @@ export function ContactPage() {
                     }}
                     placeholder="e.g., Abebe Kebede"
                     aria-invalid={Boolean(errors.senderName)}
+                    aria-describedby={errors.senderName ? 'sender-name-error' : undefined}
                   />
                   {errors.senderName && (
                     <p
+                      id="sender-name-error"
                       role="alert"
                       className="flex items-center gap-1.5 text-xs font-medium text-[#B91C1C]"
                     >
@@ -459,6 +463,7 @@ export function ContactPage() {
                   <Input
                     id="sender-role"
                     name="senderRole"
+                    autoComplete="organization-title"
                     value={senderRole}
                     onChange={(e) => setSenderRole(e.target.value)}
                     placeholder="e.g., Operations Director, CEO, IT Head"
@@ -470,6 +475,7 @@ export function ContactPage() {
                   <Input
                     id="organization-name"
                     name="organizationName"
+                    autoComplete="organization"
                     value={organizationName}
                     onChange={(e) => {
                       setOrganizationName(e.target.value);
@@ -482,9 +488,13 @@ export function ContactPage() {
                     }}
                     placeholder="Your Company or Institution"
                     aria-invalid={Boolean(errors.organizationName)}
+                    aria-describedby={
+                      errors.organizationName ? 'organization-name-error' : undefined
+                    }
                   />
                   {errors.organizationName && (
                     <p
+                      id="organization-name-error"
                       role="alert"
                       className="flex items-center gap-1.5 text-xs font-medium text-[#B91C1C]"
                     >
@@ -500,6 +510,7 @@ export function ContactPage() {
                     id="work-email"
                     name="workEmail"
                     type="email"
+                    autoComplete="email"
                     value={workEmail}
                     onChange={(e) => {
                       setWorkEmail(e.target.value);
@@ -509,9 +520,11 @@ export function ContactPage() {
                     }}
                     placeholder="name@organization.com"
                     aria-invalid={Boolean(errors.workEmail)}
+                    aria-describedby={errors.workEmail ? 'work-email-error' : undefined}
                   />
                   {errors.workEmail && (
                     <p
+                      id="work-email-error"
                       role="alert"
                       className="flex items-center gap-1.5 text-xs font-medium text-[#B91C1C]"
                     >
@@ -539,9 +552,13 @@ export function ContactPage() {
                   }}
                   placeholder="Briefly describe the operational challenge, system you want to build, or transformation goal..."
                   aria-invalid={Boolean(errors.projectContext)}
+                  aria-describedby={
+                    errors.projectContext ? 'project-context-error' : undefined
+                  }
                 />
                 {errors.projectContext && (
                   <p
+                    id="project-context-error"
                     role="alert"
                     className="flex items-center gap-1.5 text-xs font-medium text-[#B91C1C]"
                   >
@@ -578,7 +595,7 @@ export function ContactPage() {
 
               {/* Submit Button & Server Delivery Status */}
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#DFDFD9] pt-6">
-                <div className="space-y-1 text-xs text-[#687285]">
+                <div className="space-y-1 text-xs text-[#525B6C]">
                   <p>
                     Direct recipient:{' '}
                     <span className="font-mono font-semibold text-[#1A2130]">
@@ -588,7 +605,7 @@ export function ContactPage() {
                   {providerConfigured !== null && (
                     <p className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[#4A5365]">
                       <ShieldCheck
-                        className="h-3.5 w-3.5 text-[#FA8112]"
+                        className="h-3.5 w-3.5 text-[#B45309]"
                         aria-hidden="true"
                       />
                       <span>

@@ -57,6 +57,28 @@ export function HomePage() {
   const [activeBlueprintId, setActiveBlueprintId] = React.useState<FeaturedSolutionBlueprint['id']>('erp-blueprint');
   const [selectedCtaService, setSelectedCtaService] = React.useState<string>('Custom software and ERP systems');
   const [emailCopied, setEmailCopied] = React.useState(false);
+  const [hydrationStage, setHydrationStage] = React.useState<number>(() =>
+    typeof window !== 'undefined' && window.location.hash ? 2 : 0
+  );
+
+  React.useEffect(() => {
+    if (hydrationStage >= 2) return;
+    let frame2 = 0;
+    const frame1 = window.requestAnimationFrame(() => {
+      React.startTransition(() => {
+        setHydrationStage(1);
+      });
+      frame2 = window.requestAnimationFrame(() => {
+        React.startTransition(() => {
+          setHydrationStage(2);
+        });
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(frame1);
+      if (frame2) window.cancelAnimationFrame(frame2);
+    };
+  }, [hydrationStage]);
 
   const activeLayer =
     HERO_SYSTEM_LAYERS.find((layer) => layer.id === activeLayerId) ??
@@ -89,12 +111,7 @@ export function HomePage() {
       >
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
           {/* Left 7 Columns: Strategic Headline, Official Mission & Dual CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 space-y-7"
-          >
+          <div className="lg:col-span-7 space-y-7">
             <SectionKicker
               index="01"
               label={HOMEPAGE_HERO.kicker}
@@ -110,7 +127,7 @@ export function HomePage() {
               <p className="font-display text-base font-semibold text-[#1A2130] sm:text-lg">
                 “{HOMEPAGE_HERO.mission}”
               </p>
-              <p className="mt-1 text-xs text-[#687285]">
+              <p className="mt-1 text-xs text-[#525B6C]">
                 Official Mandate · Serving Businesses and Organizations Across {BYTE_BRAND.location}
               </p>
             </div>
@@ -143,21 +160,16 @@ export function HomePage() {
                 `Direct Inquiry: ${BYTE_BRAND.email}`,
               ]}
             />
-          </motion.div>
+          </div>
 
           {/* Right 5 Columns: Interactive 3-Layer "Byte System Architecture" Schematic */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5"
-          >
+          <div className="lg:col-span-5">
             <div className="relative rounded-lg border border-[#DFDFD9] bg-[#FAF9F6] p-6 sm:p-7 shadow-[0_12px_32px_-8px_rgba(26,33,48,0.08)]">
               <GridCrosshair className="absolute top-3.5 right-3.5" tone="light" />
 
               <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-4">
                 <div>
-                  <span className="font-mono text-[11px] font-medium text-[#FA8112]">
+                  <span className="font-mono text-[11px] font-semibold text-[#9A3412]">
                     INTERACTIVE SYSTEM ARCHITECTURE
                   </span>
                   <h2 className="mt-0.5 font-display text-lg font-bold text-[#1A2130]">
@@ -199,9 +211,11 @@ export function HomePage() {
                   return (
                     <button
                       key={layer.id}
+                      id={`hero-layer-tab-${layer.id}`}
                       type="button"
                       role="tab"
                       aria-selected={isSelected}
+                      aria-controls={`hero-layer-panel-${layer.id}`}
                       onClick={() => setActiveLayerId(layer.id)}
                       className={cn(
                         'w-full rounded-md border p-3.5 text-left transition-all duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
@@ -215,7 +229,7 @@ export function HomePage() {
                           <span
                             className={cn(
                               'font-mono text-xs font-semibold',
-                              isSelected ? 'text-[#FDA63A]' : 'text-[#FA8112]'
+                              isSelected ? 'text-[#FDA63A]' : 'text-[#9A3412]'
                             )}
                           >
                             {layer.index}.
@@ -227,7 +241,7 @@ export function HomePage() {
                         <span
                           className={cn(
                             'font-mono text-[11px]',
-                            isSelected ? 'text-[#B0B8C8]' : 'text-[#687285]'
+                            isSelected ? 'text-[#B0B8C8]' : 'text-[#525B6C]'
                           )}
                         >
                           {layer.services.length} Capabilities
@@ -247,22 +261,23 @@ export function HomePage() {
               </div>
 
               {/* Active Layer Details Panel with Smooth Transition */}
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeLayer.id}
+                  id={`hero-layer-panel-${activeLayer.id}`}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                   role="tabpanel"
-                  aria-label={`${activeLayer.layerName} Details`}
+                  aria-labelledby={`hero-layer-tab-${activeLayer.id}`}
                   className="mt-4 rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs font-semibold text-[#1A2130]">
                       Active Layer {activeLayer.index} · {activeLayer.layerName}
                     </span>
-                    <Layers className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
+                    <Layers className="h-4 w-4 text-[#9A3412]" aria-hidden="true" />
                   </div>
                   <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
                     {activeLayer.description}
@@ -274,12 +289,12 @@ export function HomePage() {
                         className="flex items-baseline justify-between gap-2 text-xs"
                       >
                         <span className="font-medium text-[#1A2130]">
-                          <span className="font-mono text-[#FA8112] mr-1.5">
+                          <span className="font-mono font-semibold text-[#9A3412] mr-1.5">
                             {svc.index}.
                           </span>
                           {svc.name}
                         </span>
-                        <span className="text-right text-[11px] text-[#687285]">
+                        <span className="text-right text-[11px] text-[#525B6C]">
                           {svc.role}
                         </span>
                       </li>
@@ -288,7 +303,7 @@ export function HomePage() {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </motion.div>
+          </div>
         </div>
       </ArchitecturalSection>
 
@@ -358,7 +373,7 @@ export function HomePage() {
                   </div>
 
                   <div className="mt-5 border-t border-[#DFDFD9] pt-3">
-                    <span className="block font-mono text-[11px] text-[#687285]">
+                    <span className="block font-mono text-[11px] text-[#525B6C]">
                       Primary Capability Focus:
                     </span>
                     <InlineMetadata
@@ -374,14 +389,16 @@ export function HomePage() {
         </div>
       </ArchitecturalSection>
 
-      {/* =====================================================================
-          SECTION 3: SERVICES OVERVIEW — 7 CAPABILITIES BENTO MATRIX (Warm Alabaster #F2F2EE)
-      ====================================================================== */}
-      <ArchitecturalSection
-        id="capabilities-overview"
-        tone="light"
-        withBottomRule
-      >
+      {hydrationStage >= 1 && (
+        <>
+          {/* =====================================================================
+              SECTION 3: SERVICES OVERVIEW — 7 CAPABILITIES BENTO MATRIX (Warm Alabaster #F2F2EE)
+          ====================================================================== */}
+          <ArchitecturalSection
+            id="capabilities-overview"
+            tone="light"
+            withBottomRule
+          >
         <div className="space-y-12">
           <ScrollReveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl space-y-3">
@@ -402,7 +419,7 @@ export function HomePage() {
               </p>
               <Link
                 to="/services"
-                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[#FA8112] hover:text-[#1A2130]"
+                className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[#9A3412] hover:text-[#1A2130]"
               >
                 <span>View Full Services Specification</span>
                 <ArrowUpRight
@@ -461,7 +478,7 @@ export function HomePage() {
 
                     <div className="mt-6 space-y-4 border-t border-[#DFDFD9] pt-4">
                       <div>
-                        <span className="font-mono text-[11px] font-medium text-[#687285]">
+                        <span className="font-mono text-[11px] font-medium text-[#525B6C]">
                           Key Deliverables:
                         </span>
                         <ul
@@ -476,7 +493,7 @@ export function HomePage() {
                             <li key={item} className="flex items-baseline gap-2">
                               <span
                                 aria-hidden="true"
-                                className="font-mono text-[#FA8112]"
+                                className="font-mono text-[#9A3412]"
                               >
                                 —
                               </span>
@@ -489,11 +506,11 @@ export function HomePage() {
                       <div className="flex items-center justify-between pt-1">
                         <Link
                           to={`/contact?service=${encodeURIComponent(service.id)}`}
-                          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#FA8112]"
+                          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#9A3412]"
                         >
                           <span>Inquire About {service.name}</span>
                           <ArrowRight
-                            className="h-3.5 w-3.5 text-[#FA8112] transition-transform duration-[180ms] group-hover:translate-x-1"
+                            className="h-3.5 w-3.5 text-[#9A3412] transition-transform duration-[180ms] group-hover:translate-x-1"
                             aria-hidden="true"
                           />
                         </Link>
@@ -542,9 +559,11 @@ export function HomePage() {
               return (
                 <button
                   key={bp.id}
+                  id={`home-bp-tab-${bp.id}`}
                   type="button"
                   role="tab"
                   aria-selected={isSelected}
+                  aria-controls={`home-bp-panel-${bp.id}`}
                   onClick={() => setActiveBlueprintId(bp.id)}
                   className={cn(
                     'relative flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-colors duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
@@ -554,15 +573,13 @@ export function HomePage() {
                   )}
                 >
                   {isSelected && (
-                    <motion.span
-                      layoutId="home-blueprint-active-tab"
+                    <span
                       aria-hidden="true"
-                      className="absolute inset-0 rounded-md bg-[#FFFFFF] shadow-[0_1px_3px_rgba(26,33,48,0.08)]"
-                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 rounded-md bg-[#FFFFFF] shadow-[0_1px_3px_rgba(26,33,48,0.08)] transition-all duration-[220ms]"
                     />
                   )}
                   <span className="relative z-10">
-                    <span className="font-mono text-[#FA8112] mr-1.5">
+                    <span className="font-mono text-[#9A3412] mr-1.5">
                       {bp.index}.
                     </span>
                     {bp.tabLabel}
@@ -579,15 +596,16 @@ export function HomePage() {
           </div>
 
           {/* Active Solution Blueprint Detail Panel */}
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={activeBlueprint.id}
+              id={`home-bp-panel-${activeBlueprint.id}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
               role="tabpanel"
-              aria-label={activeBlueprint.title}
+              aria-labelledby={`home-bp-tab-${activeBlueprint.id}`}
               className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
             >
               <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
@@ -607,7 +625,7 @@ export function HomePage() {
 
                     <div className="space-y-3 pt-2">
                       <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
-                        <span className="font-mono text-[11px] font-semibold text-[#687285]">
+                        <span className="font-mono text-[11px] font-semibold text-[#525B6C]">
                           LEGACY BOTTLENECK
                         </span>
                         <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
@@ -616,7 +634,7 @@ export function HomePage() {
                       </div>
 
                       <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
-                        <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
+                        <span className="font-mono text-[11px] font-semibold text-[#9A3412]">
                           BYTE TECHNOLOGY ARCHITECTURE
                         </span>
                         <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
@@ -628,20 +646,20 @@ export function HomePage() {
 
                   <div className="space-y-4 border-t border-[#DFDFD9] pt-5">
                     <div>
-                      <span className="font-mono text-xs text-[#687285]">
+                      <span className="font-mono text-xs text-[#525B6C]">
                         Capabilities Combined in This Architecture:
                       </span>
                       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[#1A2130]">
                         {activeBlueprint.servicesCombined.map((svc, idx) => (
                           <React.Fragment key={svc.id}>
                             <span>
-                              <span className="font-mono text-[#FA8112] mr-1">
+                              <span className="font-mono text-[#9A3412] mr-1">
                                 {svc.index}.
                               </span>
                               {svc.name}
                             </span>
                             {idx < activeBlueprint.servicesCombined.length - 1 && (
-                              <span aria-hidden="true" className="text-[#687285]">
+                              <span aria-hidden="true" className="text-[#525B6C]">
                                 +
                               </span>
                             )}
@@ -669,7 +687,7 @@ export function HomePage() {
                     <span className="font-mono text-xs font-semibold text-[#1A2130]">
                       SYSTEM ARCHITECTURE FLOW · {activeBlueprint.tabLabel.toUpperCase()}
                     </span>
-                    <span className="font-mono text-xs text-[#FA8112]">
+                    <span className="font-mono text-xs font-semibold text-[#9A3412]">
                       3-Tier Execution
                     </span>
                   </div>
@@ -689,7 +707,7 @@ export function HomePage() {
                       >
                         <div className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4 sm:p-5 transition-colors hover:border-[#FA8112]/50">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                            <span className="font-mono text-xs font-semibold text-[#9A3412]">
                               0{index + 1} · {node.step}
                             </span>
                             <span className="font-display text-sm font-bold text-[#1A2130]">
@@ -724,16 +742,20 @@ export function HomePage() {
           </AnimatePresence>
         </div>
       </ArchitecturalSection>
+        </>
+      )}
 
-      {/* =====================================================================
-          SECTION 5: WHY BYTE TECHNOLOGY & MISSION MANDATE (Dark Section #1A2130)
-      ====================================================================== */}
-      <ArchitecturalSection
-        tone="dark"
-        withGridBg
-        withBottomRule
-        className="py-20 md:py-28"
-      >
+      {hydrationStage >= 2 && (
+        <>
+          {/* =====================================================================
+              SECTION 5: WHY BYTE TECHNOLOGY & MISSION MANDATE (Dark Section #1A2130)
+          ====================================================================== */}
+          <ArchitecturalSection
+            tone="dark"
+            withGridBg
+            withBottomRule
+            className="py-20 md:py-28"
+          >
         <div className="space-y-16">
           {/* Top Mission Mandate Banner */}
           <ScrollReveal className="grid grid-cols-1 gap-10 border-b border-[#F2F2EE]/11 pb-14 lg:grid-cols-12 lg:items-end">
@@ -843,10 +865,10 @@ export function HomePage() {
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-3">
-                      <span className="font-mono text-sm font-bold text-[#FA8112]">
+                      <span className="font-mono text-sm font-bold text-[#9A3412]">
                         Phase {step.phase}
                       </span>
-                      <span className="font-mono text-[11px] text-[#687285]">
+                      <span className="font-mono text-[11px] text-[#525B6C]">
                         {step.subtitle}
                       </span>
                     </div>
@@ -861,7 +883,7 @@ export function HomePage() {
                   </div>
 
                   <div className="mt-6 border-t border-[#DFDFD9] pt-4">
-                    <span className="font-mono text-[11px] font-medium text-[#687285]">
+                    <span className="font-mono text-[11px] font-medium text-[#525B6C]">
                       Phase Deliverables:
                     </span>
                     <ul className="mt-2 space-y-1.5 text-xs text-[#1A2130]">
@@ -869,7 +891,7 @@ export function HomePage() {
                         <li key={output} className="flex items-baseline gap-2">
                           <span
                             aria-hidden="true"
-                            className="font-mono text-[#FA8112]"
+                            className="font-mono font-bold text-[#9A3412]"
                           >
                             ·
                           </span>
@@ -1000,7 +1022,7 @@ export function HomePage() {
                       )}
                     >
                       <span>
-                        <span className="font-mono text-[#FA8112] mr-2">
+                        <span className="font-mono text-[#FDA63A] mr-2">
                           {svc.index}.
                         </span>
                         {svc.name}
@@ -1020,6 +1042,8 @@ export function HomePage() {
           </div>
         </ScrollReveal>
       </ArchitecturalSection>
+        </>
+      )}
     </div>
   );
 }

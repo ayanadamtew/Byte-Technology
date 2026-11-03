@@ -40,10 +40,9 @@ export function Header() {
         {/* Left: Official Byte Technology Brand Lockup */}
         <Link
           to="/"
-          aria-label={`${BYTE_BRAND.name} Home`}
           className="group rounded-md transition-transform duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] focus-visible:ring-offset-2"
         >
-          <BrandLogo tone="light" showLocation />
+          <BrandLogo tone="light" showLocation priority />
         </Link>
 
         {/* Center: Primary Desktop Navigation Links with Shared Motion Hover & Active Indicators */}
@@ -81,10 +80,9 @@ export function Header() {
                   )}
                   <span className="relative z-10">{item.label}</span>
                   {isActive && (
-                    <motion.span
-                      layoutId="byte-header-active-indicator"
-                      className="absolute inset-x-3 -bottom-[15px] h-[2px] bg-[#FA8112]"
-                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-3 -bottom-[15px] h-[2px] bg-[#FA8112] transition-all duration-[220ms]"
                     />
                   )}
                 </>
@@ -154,13 +152,13 @@ export function Header() {
                       cn(
                         'group flex items-center justify-between py-3.5 text-base font-medium transition-colors',
                         isActive
-                          ? 'text-[#FA8112] font-semibold'
-                          : 'text-[#1A2130] hover:text-[#FA8112]'
+                          ? 'text-[#9A3412] font-semibold'
+                          : 'text-[#1A2130] hover:text-[#B45309]'
                       )
                     }
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-[#687285]">
+                      <span className="font-mono text-xs text-[#525B6C]">
                         {item.index}.
                       </span>
                       <span>{item.label}</span>

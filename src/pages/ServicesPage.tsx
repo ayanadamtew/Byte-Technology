@@ -118,7 +118,7 @@ export function ServicesPage() {
               <GridCrosshair className="absolute top-3.5 right-3.5" tone="light" />
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                  <span className="font-mono text-xs font-semibold text-[#9A3412]">
                     CAPABILITY DIRECTORY
                   </span>
                   <Layers className="h-4 w-4 text-[#1A2130]" aria-hidden="true" />
@@ -143,13 +143,13 @@ export function ServicesPage() {
                           className="group flex items-center justify-between rounded-md border border-[#DFDFD9] bg-[#FAF9F6] px-3.5 py-2.5 text-xs font-medium text-[#1A2130] transition-colors hover:border-[#FA8112] hover:bg-[#FFFFFF]"
                         >
                           <span>
-                            <span className="font-mono font-semibold text-[#FA8112] mr-2">
+                            <span className="font-mono font-semibold text-[#9A3412] mr-2">
                               {service.index}.
                             </span>
                             {service.name}
                           </span>
                           <ArrowRight
-                            className="h-3.5 w-3.5 text-[#687285] transition-transform group-hover:translate-x-1 group-hover:text-[#FA8112]"
+                            className="h-3.5 w-3.5 text-[#525B6C] transition-transform group-hover:translate-x-1 group-hover:text-[#B45309]"
                             aria-hidden="true"
                           />
                         </a>
@@ -328,7 +328,7 @@ export function ServicesPage() {
                 </p>
 
                 <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
-                  <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                  <span className="font-mono text-xs font-semibold text-[#B45309]">
                     BUSINESS IMPACT
                   </span>
                   <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
@@ -495,7 +495,7 @@ function ServiceSpecificationCard({
         </div>
 
         {service.placeholderNote && (
-          <p className="rounded border border-[#DFDFD9] bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#687285]">
+          <p className="rounded border border-[#DFDFD9] bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#525B6C]">
             {service.placeholderNote}
           </p>
         )}
@@ -503,7 +503,7 @@ function ServiceSpecificationCard({
 
       <CardFooter className="mt-6 flex flex-col items-start gap-4 border-t border-[#DFDFD9] pt-4">
         <div className="rounded bg-[#FAF9F6] p-3 w-full border border-[#DFDFD9]/70">
-          <span className="font-mono text-[10px] font-semibold text-[#FA8112]">
+          <span className="font-mono text-[10px] font-semibold text-[#B45309]">
             BUSINESS IMPACT
           </span>
           <p className="mt-1 text-xs leading-relaxed text-[#1A2130]">
@@ -513,11 +513,11 @@ function ServiceSpecificationCard({
 
         <Link
           to={`/contact?service=${encodeURIComponent(service.id)}`}
-          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#FA8112]"
+          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#B45309]"
         >
           <span>Inquire About {service.name}</span>
           <ArrowRight
-            className="h-3.5 w-3.5 text-[#FA8112] transition-transform group-hover:translate-x-1"
+            className="h-3.5 w-3.5 text-[#B45309] transition-transform group-hover:translate-x-1"
             aria-hidden="true"
           />
         </Link>

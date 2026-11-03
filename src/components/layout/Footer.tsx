@@ -25,7 +25,6 @@ export function Footer() {
             <div className="space-y-4">
               <Link
                 to="/"
-                aria-label={`${BYTE_BRAND.name} Home`}
                 className="inline-block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]"
               >
                 <BrandLogo tone="dark" showLocation />
@@ -86,7 +85,7 @@ export function Footer() {
                     to={`/services#${service.id}`}
                     className="group inline-flex items-baseline gap-2 text-sm text-[#B0B8C8] transition-colors hover:text-[#F2F2EE]"
                   >
-                    <span className="font-mono text-xs text-[#FA8112]">
+                    <span className="font-mono text-xs text-[#FDA63A]">
                       {service.index}.
                     </span>
                     <span className="group-hover:underline underline-offset-4">
@@ -111,7 +110,7 @@ export function Footer() {
                       to={item.path}
                       className="inline-flex items-center gap-2 text-sm text-[#B0B8C8] transition-colors hover:text-[#F2F2EE]"
                     >
-                      <span className="font-mono text-xs text-[#8490A5]">
+                      <span className="font-mono text-xs text-[#9BA6B8]">
                         {item.index}.
                       </span>
                       <span>{item.label}</span>
@@ -127,7 +126,7 @@ export function Footer() {
               </p>
               <Link
                 to="/contact"
-                className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FA8112] hover:text-[#FDA63A]"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FDA63A] hover:text-[#F2F2EE]"
               >
                 <span>Start a Project Conversation</span>
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
@@ -137,7 +136,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Copyright & Truthfulness Bar */}
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#F2F2EE]/11 pt-8 text-xs text-[#8490A5] sm:flex-row sm:items-center">
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#F2F2EE]/11 pt-8 text-xs text-[#9BA6B8] sm:flex-row sm:items-center">
           <p>
             © {currentYear} {BYTE_BRAND.name}. All rights reserved.
           </p>

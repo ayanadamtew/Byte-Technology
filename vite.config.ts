@@ -3,12 +3,40 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({command}) => {
   return {
     plugins: [react(), tailwindcss()],
+    define:
+      command === 'build'
+        ? {
+            'process.env.NODE_ENV': JSON.stringify('production'),
+          }
+        : undefined,
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname, '.'),
+      },
+    },
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              {
+                name: 'react-vendor',
+                test: /node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
+              },
+              {
+                name: 'motion-vendor',
+                test: /node_modules[\\/](motion|framer-motion|motion-dom|motion-utils)[\\/]/,
+              },
+              {
+                name: 'icons-vendor',
+                test: /node_modules[\\/]lucide-react[\\/]/,
+              },
+            ],
+          },
+        },
       },
     },
     server: {
@@ -20,3 +48,4 @@ export default defineConfig(() => {
     },
   };
 });
+

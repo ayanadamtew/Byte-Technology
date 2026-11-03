@@ -63,6 +63,85 @@ export function escapeHtml(input: string): string {
 }
 
 /**
+ * Strips carriage-return and line-feed characters from single-line header fields
+ * (sender name, role, organization, email) to prevent CRLF / header injection.
+ */
+export function sanitizeSingleLineInput(input: string, maxLength: number): string {
+  return input.replace(/[\r\n\0]+/g, ' ').slice(0, maxLength);
+}
+
+/**
+ * Standard HTTP security headers for Byte Technology responses.
+ * Preserves iframe compatibility for the AI Studio preview environment.
+ */
+export function getSecurityHeaders(): Record<string, string> {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-Permitted-Cross-Domain-Policies': 'none',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  };
+}
+
+export interface RateLimitCheckResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfterSeconds: number;
+}
+
+/**
+ * Creates a memory-safe sliding-window per-IP rate limiter for POST /api/contact.
+ */
+export function createContactRateLimiter(options?: {
+  windowMs?: number;
+  maxRequests?: number;
+}) {
+  const windowMs = options?.windowMs ?? 15 * 60 * 1000;
+  const maxRequests = options?.maxRequests ?? 15;
+  const hitsByIp = new Map<string, number[]>();
+
+  return {
+    check(clientKey: string, nowMs: number = Date.now()): RateLimitCheckResult {
+      const key = (clientKey || 'unknown').trim() || 'unknown';
+      const cutoff = nowMs - windowMs;
+      const existing = (hitsByIp.get(key) ?? []).filter((ts) => ts > cutoff);
+
+      if (existing.length >= maxRequests) {
+        const oldestInWindow = existing[0] ?? nowMs;
+        const retryAfterSeconds = Math.max(
+          1,
+          Math.ceil((oldestInWindow + windowMs - nowMs) / 1000)
+        );
+        hitsByIp.set(key, existing);
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfterSeconds,
+        };
+      }
+
+      existing.push(nowMs);
+      hitsByIp.set(key, existing);
+
+      // Periodic bound on map size to prevent unbounded memory growth
+      if (hitsByIp.size > 1000) {
+        for (const [k, timestamps] of hitsByIp.entries()) {
+          if (timestamps.every((ts) => ts <= cutoff)) {
+            hitsByIp.delete(k);
+          }
+        }
+      }
+
+      return {
+        allowed: true,
+        remaining: Math.max(0, maxRequests - existing.length),
+        retryAfterSeconds: 0,
+      };
+    },
+  };
+}
+
+/**
  * Builds a clean, high-contrast HTML email body matching Byte Technology's architectural identity.
  */
 export function buildConsultationHtmlEmail(
@@ -140,23 +219,23 @@ export async function processContactEnquiry(
       : [],
     senderName:
       typeof record.senderName === 'string'
-        ? record.senderName.slice(0, 120)
+        ? sanitizeSingleLineInput(record.senderName, 120)
         : '',
     senderRole:
       typeof record.senderRole === 'string'
-        ? record.senderRole.slice(0, 120)
+        ? sanitizeSingleLineInput(record.senderRole, 120)
         : '',
     organizationName:
       typeof record.organizationName === 'string'
-        ? record.organizationName.slice(0, 160)
+        ? sanitizeSingleLineInput(record.organizationName, 160)
         : '',
     workEmail:
       typeof record.workEmail === 'string'
-        ? record.workEmail.slice(0, 160)
+        ? sanitizeSingleLineInput(record.workEmail, 160)
         : '',
     projectContext:
       typeof record.projectContext === 'string'
-        ? record.projectContext.slice(0, 4000)
+        ? record.projectContext.replace(/\0/g, '').slice(0, 4000)
         : '',
   };
 

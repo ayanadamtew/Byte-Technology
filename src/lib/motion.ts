@@ -90,7 +90,7 @@ export function splitHeadlineIntoTokens(headline: string): string[] {
 export function createPageTransitionVariants(prefersReducedMotion: boolean) {
   return {
     initial: {
-      opacity: prefersReducedMotion ? 1 : 0,
+      opacity: 1,
       y: prefersReducedMotion ? 0 : 6,
     },
     animate: {
@@ -102,7 +102,7 @@ export function createPageTransitionVariants(prefersReducedMotion: boolean) {
       },
     },
     exit: {
-      opacity: prefersReducedMotion ? 1 : 0,
+      opacity: 1,
       y: prefersReducedMotion ? 0 : -4,
       transition: {
         duration: prefersReducedMotion ? 0.01 : 0.14,

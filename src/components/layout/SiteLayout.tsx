@@ -1,37 +1,66 @@
 import * as React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { MotionConfig, motion, useReducedMotion } from 'motion/react';
-import { resolveRouteMetadata } from '../../config/navigation';
+import { buildPageSeoPayload } from '../../config/seo';
 import { createPageTransitionVariants } from '../../lib/motion';
-import { BYTE_BRAND } from '../../styles/tokens';
 import { Header } from './Header';
 import { Footer } from './Footer';
+
+function setMetaTagContent(selector: string, content: string) {
+  const el = document.querySelector<HTMLMetaElement>(selector);
+  if (el) {
+    el.setAttribute('content', content);
+  }
+}
 
 /**
  * Shared SiteLayout wrapping all routes with:
  * - Global MotionConfig respecting OS/browser prefers-reduced-motion
  * - Accessible skip-to-content link
- * - Dynamic document title and meta description synchronization
+ * - Dynamic document title, meta description, Open Graph, Twitter Card, canonical URL, and JSON-LD synchronization
  * - Smooth scroll-to-top or hash-anchor alignment on route changes
  * - Subtle, zero-blocking page transitions between routes
  */
 export function SiteLayout() {
   const location = useLocation();
   const prefersReducedMotion = Boolean(useReducedMotion());
+  const hasMountedRef = React.useRef(false);
+
+  React.useEffect(() => {
+    hasMountedRef.current = true;
+  }, []);
+
   const pageVariants = React.useMemo(
     () => createPageTransitionVariants(prefersReducedMotion),
     [prefersReducedMotion]
   );
 
   React.useEffect(() => {
-    const routeMeta = resolveRouteMetadata(location.pathname);
-    document.title = routeMeta
-      ? routeMeta.title
-      : `Page Not Found | ${BYTE_BRAND.name}`;
+    const origin =
+      typeof window !== 'undefined' ? window.location.origin : undefined;
+    const seo = buildPageSeoPayload(location.pathname, origin);
 
-    const descriptionEl = document.querySelector('meta[name="description"]');
-    if (descriptionEl && routeMeta) {
-      descriptionEl.setAttribute('content', routeMeta.metaDescription);
+    document.title = seo.title;
+    setMetaTagContent('meta[name="description"]', seo.description);
+    setMetaTagContent('meta[name="robots"]', seo.robots);
+    setMetaTagContent('meta[property="og:title"]', seo.title);
+    setMetaTagContent('meta[property="og:description"]', seo.description);
+    setMetaTagContent('meta[property="og:url"]', seo.canonicalUrl);
+    setMetaTagContent('meta[property="og:image"]', seo.ogImage);
+    setMetaTagContent('meta[name="twitter:title"]', seo.title);
+    setMetaTagContent('meta[name="twitter:description"]', seo.description);
+    setMetaTagContent('meta[name="twitter:image"]', seo.ogImage);
+
+    const canonicalEl = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]'
+    );
+    if (canonicalEl) {
+      canonicalEl.setAttribute('href', seo.canonicalUrl);
+    }
+
+    const jsonLdEl = document.getElementById('byte-jsonld');
+    if (jsonLdEl) {
+      jsonLdEl.textContent = JSON.stringify(seo.jsonLd);
     }
 
     if (location.hash) {
@@ -71,7 +100,7 @@ export function SiteLayout() {
           <motion.div
             key={location.pathname}
             variants={pageVariants}
-            initial="initial"
+            initial={hasMountedRef.current ? 'initial' : false}
             animate="animate"
           >
             <Outlet />
@@ -83,3 +112,4 @@ export function SiteLayout() {
     </MotionConfig>
   );
 }
+

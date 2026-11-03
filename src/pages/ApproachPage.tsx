@@ -108,7 +108,7 @@ export function ApproachPage() {
             <Card surface="pure" radius="lg" padding="default" className="relative">
               <GridCrosshair className="absolute top-3.5 right-3.5" tone="light" />
               <div className="space-y-4">
-                <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                <span className="font-mono text-xs font-semibold text-[#9A3412]">
                   ARCHITECTURAL PRINCIPLES
                 </span>
                 <h2 className="font-display text-xl font-bold text-[#1A2130]">
@@ -122,19 +122,19 @@ export function ApproachPage() {
 
                 <div className="space-y-2.5 border-t border-[#DFDFD9] pt-4 text-xs text-[#1A2130]">
                   <div className="flex items-center justify-between rounded bg-[#FAF9F6] px-3.5 py-2.5 border border-[#DFDFD9]">
-                    <span className="font-mono text-[#FA8112]">01 · Alignment</span>
+                    <span className="font-mono font-semibold text-[#9A3412]">01 · Alignment</span>
                     <span className="font-medium">Workflow-First Discovery</span>
                   </div>
                   <div className="flex items-center justify-between rounded bg-[#FAF9F6] px-3.5 py-2.5 border border-[#DFDFD9]">
-                    <span className="font-mono text-[#FA8112]">02 · Blueprint</span>
+                    <span className="font-mono font-semibold text-[#B45309]">02 · Blueprint</span>
                     <span className="font-medium">Validated UI/UX &amp; Data Schemas</span>
                   </div>
                   <div className="flex items-center justify-between rounded bg-[#FAF9F6] px-3.5 py-2.5 border border-[#DFDFD9]">
-                    <span className="font-mono text-[#FA8112]">03 · Execution</span>
+                    <span className="font-mono font-semibold text-[#B45309]">03 · Execution</span>
                     <span className="font-medium">Modular Iterative Engineering</span>
                   </div>
                   <div className="flex items-center justify-between rounded bg-[#FAF9F6] px-3.5 py-2.5 border border-[#DFDFD9]">
-                    <span className="font-mono text-[#FA8112]">04 · Resilience</span>
+                    <span className="font-mono font-semibold text-[#B45309]">04 · Resilience</span>
                     <span className="font-medium">Hardened Cloud &amp; Team Onboarding</span>
                   </div>
                 </div>
@@ -176,9 +176,11 @@ export function ApproachPage() {
               return (
                 <button
                   key={bp.id}
+                  id={`approach-bp-tab-${bp.id}`}
                   type="button"
                   role="tab"
                   aria-selected={isSelected}
+                  aria-controls={`approach-bp-panel-${bp.id}`}
                   onClick={() => setSelectedBlueprintId(bp.id)}
                   className={cn(
                     'relative flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-colors duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
@@ -196,7 +198,7 @@ export function ApproachPage() {
                     />
                   )}
                   <span className="relative z-10">
-                    <span className="font-mono text-[#FA8112] mr-1.5">
+                    <span className="font-mono text-[#B45309] mr-1.5">
                       {bp.index}.
                     </span>
                     {bp.tabLabel}
@@ -209,12 +211,13 @@ export function ApproachPage() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeBlueprint.id}
+              id={`approach-bp-panel-${activeBlueprint.id}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
               role="tabpanel"
-              aria-label={activeBlueprint.title}
+              aria-labelledby={`approach-bp-tab-${activeBlueprint.id}`}
               className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
             >
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -231,7 +234,7 @@ export function ApproachPage() {
                   </h3>
 
                   <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
-                    <span className="font-mono text-[11px] font-semibold text-[#687285]">
+                    <span className="font-mono text-[11px] font-semibold text-[#525B6C]">
                       BEFORE · LEGACY BOTTLENECK
                     </span>
                     <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
@@ -240,7 +243,7 @@ export function ApproachPage() {
                   </div>
 
                   <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
-                    <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
+                    <span className="font-mono text-[11px] font-semibold text-[#B45309]">
                       AFTER · BYTE TECHNOLOGY ARCHITECTURE
                     </span>
                     <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
@@ -278,7 +281,7 @@ export function ApproachPage() {
                         className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                          <span className="font-mono text-xs font-semibold text-[#B45309]">
                             0{idx + 1} · {node.step}
                           </span>
                           <span className="font-display text-sm font-bold text-[#1A2130]">
@@ -436,7 +439,7 @@ export function ApproachPage() {
                       <li key={practice} className="flex items-start gap-2">
                         <span
                           aria-hidden="true"
-                          className="font-mono font-bold text-[#FA8112]"
+                          className="font-mono font-bold text-[#B45309]"
                         >
                           —
                         </span>
@@ -453,7 +456,7 @@ export function ApproachPage() {
           <ScrollReveal className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-6 sm:p-8">
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#FA8112]">
+                <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#B45309]">
                   <FileCode2 className="h-4 w-4" aria-hidden="true" />
                   <span>PORTFOLIO &amp; CASE STUDY REPOSITORY</span>
                 </div>

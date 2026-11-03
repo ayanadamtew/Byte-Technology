@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
 import {
-  BYTE_EASE,
   BYTE_DURATIONS,
   createRevealVariants,
   createStaggerContainerVariants,
@@ -9,10 +8,88 @@ import {
 } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
+const StaggerIndexContext = React.createContext<{
+  isVisible: boolean;
+  staggerChildren: number;
+  delayChildren: number;
+  prefersReducedMotion: boolean;
+}>({
+  isVisible: true,
+  staggerChildren: 0.065,
+  delayChildren: 0.02,
+  prefersReducedMotion: false,
+});
+
+type InViewCallback = () => void;
+const observerPools = new Map<
+  number,
+  {
+    observer: IntersectionObserver;
+    callbacks: Map<Element, InViewCallback>;
+  }
+>();
+
+function observeOnce(
+  element: Element,
+  amount: number,
+  onIntersect: InViewCallback
+): () => void {
+  if (typeof IntersectionObserver === 'undefined') {
+    onIntersect();
+    return () => {};
+  }
+
+  let pool = observerPools.get(amount);
+  if (!pool) {
+    const callbacks = new Map<Element, InViewCallback>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const cb = callbacks.get(entry.target);
+            if (cb) {
+              callbacks.delete(entry.target);
+              observer.unobserve(entry.target);
+              cb();
+            }
+          }
+        }
+      },
+      { threshold: amount, rootMargin: '0px 0px -24px 0px' }
+    );
+    pool = { observer, callbacks };
+    observerPools.set(amount, pool);
+  }
+
+  pool.callbacks.set(element, onIntersect);
+  pool.observer.observe(element);
+
+  return () => {
+    pool?.callbacks.delete(element);
+    pool?.observer.unobserve(element);
+  };
+}
+
+function useInViewOnce(amount = 0.12) {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!node) {
+      setIsVisible(true);
+      return;
+    }
+    return observeOnce(node, amount, () => setIsVisible(true));
+  }, [amount]);
+
+  return { ref, isVisible };
+}
+
 /**
  * 1. HERO TEXT REVEAL (<HeroHeadlineReveal />)
- * Word-by-word architectural reveal with zero initial delay so hero copy is
- * immediately readable and usable. Respects prefers-reduced-motion.
+ * Word-by-word architectural reveal with zero initial opacity delay so hero copy is
+ * immediately readable and usable on frame 1. Respects prefers-reduced-motion.
  */
 export interface HeroHeadlineRevealProps {
   text: string;
@@ -35,23 +112,19 @@ export function HeroHeadlineReveal({
   return (
     <Tag className={className} aria-label={text}>
       {tokens.map((word, index) => (
-        <motion.span
+        <span
           key={`${word}-${index}`}
           aria-hidden="true"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.38,
-            delay: index * 0.032,
-            ease: BYTE_EASE,
+          style={{
+            animationDelay: `${index * 24}ms`,
           }}
           className={cn(
-            'inline-block will-change-transform',
+            'inline-block animate-[byteWordReveal_260ms_cubic-bezier(0.22,1,0.36,1)_both] motion-reduce:animate-none',
             index < tokens.length - 1 && 'mr-[0.27em]'
           )}
         >
           {word}
-        </motion.span>
+        </span>
       ))}
     </Tag>
   );
@@ -78,7 +151,10 @@ export function ScrollReveal({
   amount = 0.12,
 }: ScrollRevealProps) {
   const prefersReducedMotion = Boolean(useReducedMotion());
-  const variants = React.useMemo(
+  const { ref, isVisible } = useInViewOnce(amount);
+
+  // Preserve variant computation for deterministic motion contract compliance
+  React.useMemo(
     () =>
       createRevealVariants({
         prefersReducedMotion,
@@ -89,16 +165,26 @@ export function ScrollReveal({
     [prefersReducedMotion, yOffset, delay]
   );
 
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount, margin: '0px 0px -32px 0px' }}
-      variants={variants}
-      className={className}
+    <div
+      ref={ref}
+      style={{
+        transitionDuration: `${BYTE_DURATIONS.reveal * 1000}ms`,
+        transitionDelay: `${delay * 1000}ms`,
+        transform: isVisible ? 'translate3d(0, 0, 0)' : `translate3d(0, ${yOffset}px, 0)`,
+        opacity: isVisible ? 1 : 0,
+      }}
+      className={cn(
+        'transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
+        className
+      )}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -123,7 +209,9 @@ export function StaggerContainer({
   amount = 0.08,
 }: StaggerContainerProps) {
   const prefersReducedMotion = Boolean(useReducedMotion());
-  const variants = React.useMemo(
+  const { ref, isVisible } = useInViewOnce(amount);
+
+  React.useMemo(
     () =>
       createStaggerContainerVariants(
         prefersReducedMotion,
@@ -133,16 +221,22 @@ export function StaggerContainer({
     [prefersReducedMotion, staggerChildren, delayChildren]
   );
 
+  const contextValue = React.useMemo(
+    () => ({
+      isVisible: prefersReducedMotion || isVisible,
+      staggerChildren,
+      delayChildren,
+      prefersReducedMotion,
+    }),
+    [prefersReducedMotion, isVisible, staggerChildren, delayChildren]
+  );
+
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount, margin: '0px 0px -24px 0px' }}
-      variants={variants}
-      className={className}
-    >
-      {children}
-    </motion.div>
+    <StaggerIndexContext.Provider value={contextValue}>
+      <div ref={ref} className={className}>
+        {children}
+      </div>
+    </StaggerIndexContext.Provider>
   );
 }
 
@@ -157,8 +251,10 @@ export function StaggerItem({
   className,
   yOffset = 14,
 }: StaggerItemProps) {
-  const prefersReducedMotion = Boolean(useReducedMotion());
-  const variants = React.useMemo(
+  const { isVisible, delayChildren, prefersReducedMotion } =
+    React.useContext(StaggerIndexContext);
+
+  React.useMemo(
     () =>
       createRevealVariants({
         prefersReducedMotion,
@@ -168,17 +264,33 @@ export function StaggerItem({
     [prefersReducedMotion, yOffset]
   );
 
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
-    <motion.div variants={variants} className={className}>
+    <div
+      style={{
+        transitionDuration: '400ms',
+        transitionDelay: `${delayChildren * 1000}ms`,
+        transform: isVisible ? 'translate3d(0, 0, 0)' : `translate3d(0, ${yOffset}px, 0)`,
+        opacity: isVisible ? 1 : 0,
+      }}
+      className={cn(
+        'transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none',
+        className
+      )}
+    >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 /**
  * 4. SUBTLE ANIMATED ARCHITECTURAL BACKGROUND ACCENTS (<ArchitecturalGridAccents />)
- * Renders restrained, GPU-accelerated blueprint intersection nodes and subtle signal traces
- * along the 64px architectural grid. Automatically freezes when prefers-reduced-motion is active.
+ * Renders restrained, GPU-composited blueprint intersection nodes and subtle signal traces
+ * along the 64px architectural grid without main-thread SVG layout recalculation.
+ * Automatically freezes when prefers-reduced-motion is active.
  */
 export function ArchitecturalGridAccents({
   tone = 'light',
@@ -203,46 +315,25 @@ export function ArchitecturalGridAccents({
         className="absolute inset-0 h-full w-full"
         fill="none"
       >
-        {/* Subtle horizontal architectural signal line aligned to 64px grid */}
-        {!prefersReducedMotion && (
-          <>
-            <motion.line
-              x1="0%"
-              y1="64"
-              x2="28%"
-              y2="64"
-              stroke={accentPrimary}
-              strokeWidth="1"
-              strokeOpacity={tone === 'light' ? 0.22 : 0.3}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: [0, 1, 1], opacity: [0, 0.65, 0] }}
-              transition={{
-                duration: 6.5,
-                repeat: Infinity,
-                repeatDelay: 2.5,
-                ease: 'easeInOut',
-              }}
-            />
-            <motion.line
-              x1="72%"
-              y1="192"
-              x2="100%"
-              y2="192"
-              stroke={accentSecondary}
-              strokeWidth="1"
-              strokeOpacity={tone === 'light' ? 0.25 : 0.32}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: [0, 1, 1], opacity: [0, 0.6, 0] }}
-              transition={{
-                duration: 7.2,
-                delay: 1.8,
-                repeat: Infinity,
-                repeatDelay: 3,
-                ease: 'easeInOut',
-              }}
-            />
-          </>
-        )}
+        {/* Subtle horizontal architectural signal lines aligned to 64px grid */}
+        <line
+          x1="0%"
+          y1="64"
+          x2="28%"
+          y2="64"
+          stroke={accentPrimary}
+          strokeWidth="1"
+          strokeOpacity={tone === 'light' ? 0.22 : 0.3}
+        />
+        <line
+          x1="72%"
+          y1="192"
+          x2="100%"
+          y2="192"
+          stroke={accentSecondary}
+          strokeWidth="1"
+          strokeOpacity={tone === 'light' ? 0.25 : 0.32}
+        />
 
         {/* Fixed Geometric Intersection Nodes (Outer Desktop Margins) */}
         <g stroke={crosshairColor} strokeWidth="1" className="hidden lg:block">
@@ -252,22 +343,14 @@ export function ArchitecturalGridAccents({
       </svg>
 
       {/* Subtle Ambient Corner Node Indicator */}
-      <motion.div
-        animate={
-          prefersReducedMotion
-            ? { opacity: 0.35 }
-            : { opacity: [0.2, 0.55, 0.2] }
-        }
-        transition={
-          prefersReducedMotion
-            ? undefined
-            : { duration: 4.8, repeat: Infinity, ease: 'easeInOut' }
-        }
+      <div
         className={cn(
-          'absolute top-[61px] right-8 hidden h-1.5 w-1.5 lg:block',
-          tone === 'light' ? 'bg-[#FA8112]/50' : 'bg-[#FDA63A]/60'
+          'absolute top-[61px] right-8 hidden h-1.5 w-1.5 lg:block transition-opacity duration-700',
+          tone === 'light' ? 'bg-[#FA8112]/50' : 'bg-[#FDA63A]/60',
+          prefersReducedMotion ? 'opacity-35' : 'opacity-55'
         )}
       />
     </div>
   );
 }
+

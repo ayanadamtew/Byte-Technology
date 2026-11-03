@@ -9,7 +9,7 @@ export interface SectionKickerProps extends React.HTMLAttributes<HTMLDivElement>
 
 /**
  * Unboxed editorial index & metadata kicker.
- * Strictly follows Zero-Pill Discipline (no rounded pill boxes or code-comment prefixes).
+ * Strictly follows Zero-Pill Discipline and WCAG 2.1 AA contrast (>= 6.0:1).
  */
 export function SectionKicker({
   index,
@@ -33,7 +33,14 @@ export function SectionKicker({
       />
       {index && (
         <>
-          <span className="font-mono font-medium text-[#FA8112]">{index}</span>
+          <span
+            className={cn(
+              'font-mono font-semibold',
+              tone === 'light' ? 'text-[#9A3412]' : 'text-[#FDA63A]'
+            )}
+          >
+            {index}
+          </span>
           <span aria-hidden="true" className="opacity-50">
             ·
           </span>
@@ -62,7 +69,7 @@ export function InlineMetadata({
     <div
       className={cn(
         'flex flex-wrap items-center gap-x-2 gap-y-1 text-xs',
-        tone === 'light' ? 'text-[#687285]' : 'text-[#8490A5]',
+        tone === 'light' ? 'text-[#525B6C]' : 'text-[#9BA6B8]',
         className
       )}
       {...props}
@@ -80,3 +87,4 @@ export function InlineMetadata({
     </div>
   );
 }
+

@@ -61,7 +61,7 @@ export function AboutPage() {
               <p className="font-display text-xl font-bold text-[#1A2130] sm:text-2xl">
                 “{BYTE_BRAND.mission}”
               </p>
-              <footer className="mt-2 font-mono text-xs text-[#687285]">
+              <footer className="mt-2 font-mono text-xs text-[#525B6C]">
                 Official Company Mission · {BYTE_BRAND.name} ({BYTE_BRAND.location})
               </footer>
             </blockquote>
@@ -99,7 +99,7 @@ export function AboutPage() {
 
                 <div className="space-y-3 border-t border-[#DFDFD9] pt-4 text-sm">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-xs text-[#687285]">
+                    <span className="font-mono text-xs text-[#525B6C]">
                       COMPANY NAME
                     </span>
                     <span className="font-semibold text-[#1A2130]">
@@ -107,7 +107,7 @@ export function AboutPage() {
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-xs text-[#687285]">
+                    <span className="font-mono text-xs text-[#525B6C]">
                       HEADQUARTERS
                     </span>
                     <span className="font-semibold text-[#1A2130]">
@@ -115,7 +115,7 @@ export function AboutPage() {
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-xs text-[#687285]">
+                    <span className="font-mono text-xs text-[#525B6C]">
                       PRIMARY FOCUS
                     </span>
                     <span className="font-semibold text-[#1A2130]">
@@ -123,20 +123,20 @@ export function AboutPage() {
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-xs text-[#687285]">
+                    <span className="font-mono text-xs text-[#525B6C]">
                       CORE DISCIPLINES
                     </span>
-                    <span className="font-semibold text-[#FA8112]">
+                    <span className="font-semibold text-[#9A3412]">
                       7 Integrated Services
                     </span>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-xs text-[#687285]">
+                    <span className="font-mono text-xs text-[#525B6C]">
                       DIRECT EMAIL
                     </span>
                     <a
                       href={buildConsultationMailto()}
-                      className="font-mono text-xs font-semibold text-[#1A2130] underline-offset-4 hover:text-[#FA8112] hover:underline"
+                      className="font-mono text-xs font-semibold text-[#1A2130] underline-offset-4 hover:text-[#B45309] hover:underline"
                     >
                       {BYTE_BRAND.email}
                     </a>
@@ -261,7 +261,7 @@ export function AboutPage() {
                 <div className="mt-4 pt-3 border-t border-[#DFDFD9]">
                   <Link
                     to="/services"
-                    className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#FA8112] hover:text-[#1A2130]"
+                    className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#B45309] hover:text-[#1A2130]"
                   >
                     <span>View All 7 Services</span>
                     <ArrowRight
@@ -301,7 +301,7 @@ export function AboutPage() {
               className="lg:col-span-6 space-y-4 border-[#DFDFD9]"
             >
               <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#1A2130]">
-                <Building2 className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
+                <Building2 className="h-4 w-4 text-[#B45309]" aria-hidden="true" />
                 <span>OFFICIAL SERVICE PORTFOLIO</span>
               </div>
               <p className="text-sm text-[#4A5365]">
@@ -312,12 +312,12 @@ export function AboutPage() {
                 {BYTE_OFFICIAL_SERVICES.map((svc) => (
                   <li key={svc.id} className="flex items-center justify-between">
                     <span>
-                      <span className="font-mono text-xs text-[#FA8112] mr-2">
+                      <span className="font-mono text-xs font-semibold text-[#B45309] mr-2">
                         {svc.index}.
                       </span>
                       <span className="font-medium">{svc.name}</span>
                     </span>
-                    <span className="text-xs text-[#687285]">{svc.pillar}</span>
+                    <span className="text-xs text-[#525B6C]">{svc.pillar}</span>
                   </li>
                 ))}
               </ul>
@@ -326,7 +326,7 @@ export function AboutPage() {
             {/* Explicit Placeholders for Unverified Historical / Leadership Details */}
             <div className="lg:col-span-6 space-y-4">
               <div className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-5">
-                <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                <span className="font-mono text-xs font-semibold text-[#B45309]">
                   FOUNDING STORY &amp; MILESTONES
                 </span>
                 <p className="mt-2 font-mono text-xs leading-relaxed text-[#4A5365]">
@@ -335,7 +335,7 @@ export function AboutPage() {
               </div>
 
               <div className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-5">
-                <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                <span className="font-mono text-xs font-semibold text-[#B45309]">
                   EXECUTIVE LEADERSHIP &amp; TEAM
                 </span>
                 <p className="mt-2 font-mono text-xs leading-relaxed text-[#4A5365]">
@@ -344,7 +344,7 @@ export function AboutPage() {
               </div>
 
               <div className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-5">
-                <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                <span className="font-mono text-xs font-semibold text-[#B45309]">
                   VERIFIED CLIENT PORTFOLIO &amp; TESTIMONIALS
                 </span>
                 <p className="mt-2 font-mono text-xs leading-relaxed text-[#4A5365]">

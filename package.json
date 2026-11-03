@@ -9,10 +9,10 @@
     "start": "tsx server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "tsx --test src/styles/tokens.test.ts src/config/navigation.test.ts src/config/homepage.test.ts src/config/pages.test.ts src/lib/motion.test.ts src/server/contact-service.test.ts src/config/seo.test.ts"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
     "@radix-ui/react-slot": "^1.5.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
@@ -32,8 +32,6 @@
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",

@@ -18,10 +18,10 @@
     /* Typography & Ink Hierarchy */
     --byte-ink-primary: #1A2130;
     --byte-ink-secondary: #4A5365;
-    --byte-ink-muted: #687285;
+    --byte-ink-muted: #525B6C;
     --byte-dark-ink-primary: #F2F2EE;
     --byte-dark-ink-secondary: #B0B8C8;
-    --byte-dark-ink-muted: #8490A5;
+    --byte-dark-ink-muted: #9BA6B8;
 
     /* Official Logo Chromatic Accents */
     --byte-accent-orange: #FA8112;
@@ -93,6 +93,15 @@
   code, pre, .font-mono {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes byteWordReveal {
+  0% {
+    transform: translate3d(0, 8px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
   }
 }
 
