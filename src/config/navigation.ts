@@ -98,3 +98,76 @@ export function buildConsultationMailto(params?: {
       : 'Project Consultation Inquiry — Byte Technology');
   return `mailto:${baseEmail}?subject=${encodeURIComponent(subjectText)}`;
 }
+
+export interface ByteSocialLink {
+  id: 'linkedin' | 'github' | 'x' | 'telegram';
+  label: string;
+  href: string;
+}
+
+/**
+ * Validates that an external link is a well-formed https:// URL and not a placeholder.
+ */
+export function isValidExternalHttpsUrl(rawUrl: string | undefined): boolean {
+  if (!rawUrl) return false;
+  const trimmed = rawUrl.trim();
+  if (!trimmed || trimmed.startsWith('MY_') || trimmed.includes('placeholder')) {
+    return false;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'https:' && Boolean(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Returns only verified external social links that have been explicitly configured.
+ * Never fabricates or guesses unverified social profile URLs.
+ */
+export function getVerifiedSocialLinks(
+  env?: Record<string, string | undefined>
+): readonly ByteSocialLink[] {
+  const sourceEnv: Record<string, string | undefined> =
+    env ??
+    ((typeof import.meta !== 'undefined' &&
+      (import.meta as unknown as { env?: Record<string, string | undefined> }).env) ||
+      {});
+
+  const candidates: Array<{
+    id: ByteSocialLink['id'];
+    label: string;
+    raw: string | undefined;
+  }> = [
+    {
+      id: 'linkedin',
+      label: 'LinkedIn',
+      raw: sourceEnv.VITE_SOCIAL_LINKEDIN_URL,
+    },
+    {
+      id: 'github',
+      label: 'GitHub',
+      raw: sourceEnv.VITE_SOCIAL_GITHUB_URL,
+    },
+    {
+      id: 'x',
+      label: 'X (Twitter)',
+      raw: sourceEnv.VITE_SOCIAL_X_URL,
+    },
+    {
+      id: 'telegram',
+      label: 'Telegram',
+      raw: sourceEnv.VITE_SOCIAL_TELEGRAM_URL,
+    },
+  ];
+
+  return candidates
+    .filter((item) => isValidExternalHttpsUrl(item.raw))
+    .map((item) => ({
+      id: item.id,
+      label: item.label,
+      href: item.raw!.trim(),
+    }));
+}
+

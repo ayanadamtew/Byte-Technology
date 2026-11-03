@@ -36,11 +36,20 @@ export function SiteLayout() {
 
     if (location.hash) {
       const targetId = location.hash.replace('#', '');
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-        return;
+      const scrollToHashTarget = () => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return true;
+        }
+        return false;
+      };
+
+      if (!scrollToHashTarget()) {
+        const timerId = window.setTimeout(scrollToHashTarget, 60);
+        return () => window.clearTimeout(timerId);
       }
+      return;
     }
 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });

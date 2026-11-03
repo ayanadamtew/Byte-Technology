@@ -1,16 +1,20 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Mail, MapPin } from 'lucide-react';
-import { BYTE_NAVIGATION_ITEMS } from '../../config/navigation';
+import {
+  BYTE_NAVIGATION_ITEMS,
+  getVerifiedSocialLinks,
+} from '../../config/navigation';
 import { BYTE_BRAND, BYTE_OFFICIAL_SERVICES } from '../../styles/tokens';
 import { BrandLogo } from './BrandLogo';
 
 /**
  * Global Architectural Footer (Dark Section — Byte Navy Obsidian #1A2130).
  * Presents verified company information, all 7 official services, navigation links,
- * and direct contact access without any fabricated metrics or ornamental engines.
+ * verified social profiles (when configured), and direct contact access.
  */
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const socialLinks = getVerifiedSocialLinks();
 
   return (
     <footer className="dark-section border-t border-[#F2F2EE]/11 bg-[#1A2130] text-[#F2F2EE]">
@@ -36,7 +40,7 @@ export function Footer() {
               </p>
             </div>
 
-            <div className="space-y-2 pt-2 text-xs text-[#B0B8C8]">
+            <div className="space-y-3 pt-2 text-xs text-[#B0B8C8]">
               <div className="flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5 text-[#FA8112]" aria-hidden="true" />
                 <span>Location: {BYTE_BRAND.location}</span>
@@ -50,6 +54,23 @@ export function Footer() {
                   {BYTE_BRAND.email}
                 </a>
               </div>
+
+              {socialLinks.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.id}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded border border-[#F2F2EE]/15 bg-[#232C3F] px-2.5 py-1 font-mono text-[11px] text-[#F2F2EE] transition-colors hover:border-[#FA8112] hover:text-[#FDA63A]"
+                    >
+                      <span>{social.label}</span>
+                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -128,3 +149,4 @@ export function Footer() {
     </footer>
   );
 }
+

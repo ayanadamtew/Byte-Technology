@@ -5,9 +5,11 @@ import {
   Check,
   CheckCircle2,
   Copy,
+  Loader2,
   Mail,
   MapPin,
   Send,
+  ShieldCheck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
@@ -33,10 +35,18 @@ import {
   StaggerItem,
 } from '../components/ui/motion-primitives';
 
+interface ContactSubmissionOutcome {
+  deliveryStatus: 'delivered' | 'provider_unconfigured' | 'provider_error' | 'network_error';
+  message: string;
+  recipient: string;
+  emailId?: string;
+  brief: ReturnType<typeof formatConsultationBrief>;
+}
+
 /**
  * BYTE TECHNOLOGY — CONTACT & CONSULTATION PAGE (/contact)
  * Implements the approved section structure and interactive Project Consultation Brief Builder
- * from docs/WEBSITE_STRUCTURE.md and docs/WEBSITE_CONTENT.md:
+ * with server-side validation and Resend email notification integration (`POST /api/contact`):
  * 5.1 Contact Hero & Direct Executive Channels (Light #F2F2EE)
  * 5.2 Interactive Project Consultation & Service Intake (Ivory #FAF9F6)
  * 5.3 What to Expect After You Reach Out — 3-Step Response Governance (Dark #1A2130)
@@ -54,11 +64,14 @@ export function ContactPage() {
   const [organizationName, setOrganizationName] = React.useState('');
   const [workEmail, setWorkEmail] = React.useState('');
   const [projectContext, setProjectContext] = React.useState('');
+  const [websiteHoneypot, setWebsiteHoneypot] = React.useState('');
 
   const [errors, setErrors] = React.useState<ConsultationValidationResult['errors']>({});
-  const [submittedBrief, setSubmittedBrief] = React.useState<ReturnType<
-    typeof formatConsultationBrief
-  > | null>(null);
+  const [submitErrorBanner, setSubmitErrorBanner] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [providerConfigured, setProviderConfigured] = React.useState<boolean | null>(null);
+  const [submissionOutcome, setSubmissionOutcome] =
+    React.useState<ContactSubmissionOutcome | null>(null);
   const [copiedBrief, setCopiedBrief] = React.useState(false);
   const [copiedDirectEmail, setCopiedDirectEmail] = React.useState(false);
 
@@ -72,6 +85,24 @@ export function ContactPage() {
     }
   }, [initialServiceParam]);
 
+  // Query server-side email provider readiness status on mount
+  React.useEffect(() => {
+    let active = true;
+    fetch('/api/contact/status')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data && typeof data.configured === 'boolean') {
+          setProviderConfigured(data.configured);
+        }
+      })
+      .catch(() => {
+        // Non-blocking status check
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const toggleService = (serviceId: string) => {
     setSelectedServiceIds((prev) =>
       prev.includes(serviceId)
@@ -83,39 +114,93 @@ export function ContactPage() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validation = validateConsultationForm({
+    setSubmitErrorBanner(null);
+
+    const payload = {
       selectedServiceIds,
       senderName,
       senderRole,
       organizationName,
       workEmail,
       projectContext,
-    });
+      websiteHoneypot,
+    };
+
+    const validation = validateConsultationForm(payload);
 
     if (!validation.valid) {
       setErrors(validation.errors);
-      setSubmittedBrief(null);
+      setSubmissionOutcome(null);
+      setSubmitErrorBanner(
+        'Please review the highlighted fields below before submitting your consultation inquiry.'
+      );
       return;
     }
 
     setErrors({});
-    const formatted = formatConsultationBrief({
-      selectedServiceIds,
-      senderName,
-      senderRole,
-      organizationName,
-      workEmail,
-      projectContext,
-    });
-    setSubmittedBrief(formatted);
+    setIsSubmitting(true);
+
+    const localFormatted = formatConsultationBrief(payload);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok && response.status === 400) {
+        if (data?.errors) {
+          setErrors(data.errors);
+        }
+        setSubmissionOutcome(null);
+        setSubmitErrorBanner(
+          data?.message ||
+            'Please correct the highlighted fields and resubmit your consultation brief.'
+        );
+        return;
+      }
+
+      if (data && data.brief) {
+        setSubmissionOutcome({
+          deliveryStatus: data.deliveryStatus ?? 'provider_unconfigured',
+          message: data.message,
+          recipient: data.recipient ?? BYTE_BRAND.email,
+          emailId: data.emailId,
+          brief: data.brief,
+        });
+      } else {
+        setSubmissionOutcome({
+          deliveryStatus: 'provider_error',
+          message:
+            data?.message ||
+            `Your consultation brief was formatted, but automated server email delivery encountered an error. Please use the direct email dispatch button below to send to ${BYTE_BRAND.email}.`,
+          recipient: BYTE_BRAND.email,
+          brief: localFormatted,
+        });
+      }
+    } catch {
+      setSubmissionOutcome({
+        deliveryStatus: 'network_error',
+        message: `Could not reach the server endpoint, so your consultation brief was prepared locally. Please click "Open in Email Client" below to send directly to ${BYTE_BRAND.email}.`,
+        recipient: BYTE_BRAND.email,
+        brief: localFormatted,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyBriefText = async () => {
-    if (!submittedBrief) return;
+    if (!submissionOutcome) return;
     try {
-      await navigator.clipboard.writeText(submittedBrief.body);
+      await navigator.clipboard.writeText(submissionOutcome.brief.body);
       setCopiedBrief(true);
       window.setTimeout(() => setCopiedBrief(false), 2500);
     } catch {
@@ -466,59 +551,122 @@ export function ContactPage() {
                 )}
               </div>
 
-              {/* Submit Button */}
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#DFDFD9] pt-6">
-                <p className="text-xs text-[#687285]">
-                  Direct recipient:{' '}
-                  <span className="font-mono font-semibold text-[#1A2130]">
-                    {BYTE_BRAND.email}
-                  </span>
-                </p>
+              {/* Anti-Spam Honeypot (Hidden from assistive & visual users) */}
+              <div className="sr-only" aria-hidden="true">
+                <label htmlFor="website-honeypot">Leave this field empty</label>
+                <input
+                  id="website-honeypot"
+                  name="websiteHoneypot"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={websiteHoneypot}
+                  onChange={(e) => setWebsiteHoneypot(e.target.value)}
+                />
+              </div>
 
-                <Button type="submit" variant="primary" size="lg">
-                  <Send className="h-4 w-4" aria-hidden="true" />
-                  <span>
-                    Prepare &amp; Send Consultation Inquiry to {BYTE_BRAND.email}
-                  </span>
+              {/* Validation / Submission Error Banner */}
+              {submitErrorBanner && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-2.5 rounded-md border border-[#B91C1C]/35 bg-[#FEF2F2] p-4 text-xs font-medium text-[#B91C1C]"
+                >
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{submitErrorBanner}</span>
+                </div>
+              )}
+
+              {/* Submit Button & Server Delivery Status */}
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#DFDFD9] pt-6">
+                <div className="space-y-1 text-xs text-[#687285]">
+                  <p>
+                    Direct recipient:{' '}
+                    <span className="font-mono font-semibold text-[#1A2130]">
+                      {BYTE_BRAND.email}
+                    </span>
+                  </p>
+                  {providerConfigured !== null && (
+                    <p className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[#4A5365]">
+                      <ShieldCheck
+                        className="h-3.5 w-3.5 text-[#FA8112]"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {providerConfigured
+                          ? 'Server-side Resend notification: Active'
+                          : 'Server validation active · Direct email dispatch & Resend integration ready'}
+                      </span>
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2
+                        className="h-4 w-4 animate-spin"
+                        aria-hidden="true"
+                      />
+                      <span>Submitting Consultation Inquiry...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" aria-hidden="true" />
+                      <span>
+                        Submit Consultation Inquiry to {BYTE_BRAND.email}
+                      </span>
+                    </>
+                  )}
                 </Button>
               </div>
             </form>
 
-            {/* Prepared Consultation Brief Confirmation Panel */}
-            {submittedBrief && (
+            {/* Consultation Submission & Delivery Status Panel */}
+            {submissionOutcome && (
               <div
                 role="status"
                 aria-live="polite"
-                className="mt-8 rounded-lg border border-[#15803D]/40 bg-[#FAF9F6] p-6"
+                className={cn(
+                  'mt-8 rounded-lg border p-6',
+                  submissionOutcome.deliveryStatus === 'delivered'
+                    ? 'border-[#15803D]/50 bg-[#F0FDF4]'
+                    : 'border-[#FA8112]/45 bg-[#FAF9F6]'
+                )}
               >
                 <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#DFDFD9] pb-4">
                   <div className="flex items-center gap-2.5 text-[#15803D]">
                     <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
                     <h3 className="font-display text-lg font-bold text-[#1A2130]">
-                      Consultation Brief Ready for Dispatch
+                      {submissionOutcome.deliveryStatus === 'delivered'
+                        ? `Consultation Inquiry Sent to ${submissionOutcome.recipient}`
+                        : 'Consultation Brief Validated & Ready for Dispatch'}
                     </h3>
                   </div>
                   <span className="font-mono text-xs text-[#4A5365]">
-                    Recipient: {BYTE_BRAND.email}
+                    Recipient: {submissionOutcome.recipient}
                   </span>
                 </div>
 
-                <p className="mt-3 text-sm text-[#4A5365]">
-                  Your project consultation brief has been structured below. Click{' '}
-                  <strong>Open in Email Client</strong> to send directly to{' '}
-                  <span className="font-mono text-[#1A2130]">{BYTE_BRAND.email}</span>,
-                  or copy the formatted brief to your clipboard:
+                <p className="mt-3 text-sm leading-relaxed text-[#4A5365]">
+                  {submissionOutcome.message}
                 </p>
 
                 <pre className="mt-4 overflow-x-auto rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4 font-mono text-xs leading-relaxed text-[#1A2130]">
-                  {submittedBrief.body}
+                  {submissionOutcome.brief.body}
                 </pre>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <Button asChild variant="navy" size="default">
-                    <a href={submittedBrief.mailtoHref}>
+                    <a href={submissionOutcome.brief.mailtoHref}>
                       <Mail className="h-4 w-4" aria-hidden="true" />
-                      <span>Open in Email Client ({BYTE_BRAND.email})</span>
+                      <span>
+                        Open in Email Client ({submissionOutcome.recipient})
+                      </span>
                     </a>
                   </Button>
 
