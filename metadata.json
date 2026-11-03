@@ -1,0 +1,6 @@
+{
+  "name": "Byte Technology",
+  "description": "Our mission is simple: To Digitalize Ethiopia. Full-spectrum software engineering, custom ERP systems, cloud infrastructure, IT consulting, UI/UX design, and AI automation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
