@@ -23,6 +23,12 @@ import {
   CardContent,
   CardFooter,
 } from '../components/ui/card';
+import {
+  HeroHeadlineReveal,
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from '../components/ui/motion-primitives';
 import { ServiceSchematic } from '../components/home/ServiceSchematic';
 
 /**
@@ -69,9 +75,10 @@ export function ServicesPage() {
               tone="light"
             />
 
-            <h1 className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]">
-              End-to-End Software Engineering, Cloud, and Digital Transformation Services in Ethiopia.
-            </h1>
+            <HeroHeadlineReveal
+              text="End-to-End Software Engineering, Cloud, and Digital Transformation Services in Ethiopia."
+              className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]"
+            />
 
             <p className="max-w-2xl text-base leading-relaxed text-[#4A5365] sm:text-lg">
               Whether your organization needs to build a mission-critical ERP
@@ -161,7 +168,7 @@ export function ServicesPage() {
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="space-y-12">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="Pillar I"
               label="Digital Products & User Experiences"
@@ -175,13 +182,15 @@ export function ServicesPage() {
               application engineering so your customers and teams experience zero
               friction across every device.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <StaggerContainer className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {digitalProductServices.map((service) => (
-              <ServiceSpecificationCard key={service.id} service={service} />
+              <StaggerItem key={service.id} className="flex">
+                <ServiceSpecificationCard service={service} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -196,7 +205,7 @@ export function ServicesPage() {
         withBottomRule
         className="scroll-mt-20 py-20 md:py-28"
       >
-        <div className="space-y-12">
+        <ScrollReveal className="space-y-12">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-7 space-y-4">
               <SectionKicker
@@ -279,7 +288,7 @@ export function ServicesPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
 
       {/* =====================================================================
@@ -292,7 +301,7 @@ export function ServicesPage() {
         withBottomRule
         className="scroll-mt-20"
       >
-        <div className="space-y-10">
+        <ScrollReveal className="space-y-10">
           <div className="max-w-3xl space-y-3">
             <SectionKicker
               index="Pillar III · Service 07"
@@ -359,7 +368,7 @@ export function ServicesPage() {
               </div>
             </div>
           </Card>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
 
       {/* =====================================================================
@@ -368,7 +377,7 @@ export function ServicesPage() {
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="space-y-12">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="Pillar IV"
               label="Technical Strategy & Cloud Infrastructure"
@@ -381,13 +390,15 @@ export function ServicesPage() {
               Establish a secure, scalable technical roadmap and cloud
               infrastructure designed to support long-term institutional growth.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <StaggerContainer className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {strategyCloudServices.map((service) => (
-              <ServiceSpecificationCard key={service.id} service={service} />
+              <StaggerItem key={service.id} className="flex">
+                <ServiceSpecificationCard service={service} />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -400,7 +411,7 @@ export function ServicesPage() {
         withBottomRule={false}
         className="py-16 md:py-24"
       >
-        <div className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
+        <ScrollReveal className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
           <div className="max-w-2xl space-y-3">
             <SectionKicker
               index="08"
@@ -426,7 +437,7 @@ export function ServicesPage() {
               </Link>
             </Button>
           </div>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
     </div>
   );

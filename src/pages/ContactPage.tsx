@@ -26,6 +26,12 @@ import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
+import {
+  HeroHeadlineReveal,
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from '../components/ui/motion-primitives';
 
 /**
  * BYTE TECHNOLOGY — CONTACT & CONSULTATION PAGE (/contact)
@@ -152,9 +158,10 @@ export function ContactPage() {
               tone="light"
             />
 
-            <h1 className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]">
-              Start a Project Conversation with Byte Technology.
-            </h1>
+            <HeroHeadlineReveal
+              text="Start a Project Conversation with Byte Technology."
+              className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]"
+            />
 
             <p className="max-w-2xl text-base leading-relaxed text-[#4A5365] sm:text-lg">
               Whether you are looking to architect a custom ERP system, build a
@@ -247,7 +254,7 @@ export function ContactPage() {
           SECTION 5.2: INTERACTIVE PROJECT CONSULTATION BRIEF BUILDER (Ivory #FAF9F6)
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
-        <div className="mx-auto max-w-4xl space-y-8">
+        <ScrollReveal className="mx-auto max-w-4xl space-y-8">
           <div className="space-y-3">
             <SectionKicker
               index="02"
@@ -537,7 +544,7 @@ export function ContactPage() {
               </div>
             )}
           </Card>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
 
       {/* =====================================================================
@@ -550,7 +557,7 @@ export function ContactPage() {
         className="py-20 md:py-24"
       >
         <div className="space-y-10">
-          <div className="max-w-2xl space-y-3">
+          <ScrollReveal className="max-w-2xl space-y-3">
             <SectionKicker
               index="03"
               label="Consultation Governance"
@@ -559,29 +566,31 @@ export function ContactPage() {
             <h2 className="font-display text-[clamp(1.75rem,2.8vw,2.5rem)] font-bold leading-[1.12] tracking-[-0.025em] text-[#F2F2EE]">
               What to Expect After You Reach Out
             </h2>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {CONSULTATION_RESPONSE_STEPS.map((step) => (
-              <Card
-                key={step.step}
-                surface="dark"
-                radius="lg"
-                padding="default"
-                className="space-y-3"
-              >
-                <span className="font-mono text-sm font-bold text-[#FDA63A]">
-                  Step {step.step}
-                </span>
-                <h3 className="font-display text-xl font-bold text-[#F2F2EE]">
-                  {step.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-[#B0B8C8]">
-                  {step.description}
-                </p>
-              </Card>
+              <StaggerItem key={step.step} className="h-full">
+                <Card
+                  surface="dark"
+                  interactive="darkInteractive"
+                  radius="lg"
+                  padding="default"
+                  className="h-full space-y-3"
+                >
+                  <span className="font-mono text-sm font-bold text-[#FDA63A]">
+                    Step {step.step}
+                  </span>
+                  <h3 className="font-display text-xl font-bold text-[#F2F2EE]">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[#B0B8C8]">
+                    {step.description}
+                  </p>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
     </div>

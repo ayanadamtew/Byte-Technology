@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '../../lib/utils';
+import { ArchitecturalGridAccents } from './motion-primitives';
 
 export interface SectionContainerProps extends React.HTMLAttributes<HTMLElement> {
   tone?: 'light' | 'ivory' | 'dark';
@@ -11,7 +12,8 @@ export interface SectionContainerProps extends React.HTMLAttributes<HTMLElement>
 
 /**
  * Architectural section wrapper enforcing Byte Technology's 1280px container bounds,
- * rhythmic light/dark surface cadence, and exposed 1px structural hairlines.
+ * rhythmic light/dark surface cadence, exposed 1px structural hairlines, and
+ * subtle blueprint grid accents.
  */
 export function ArchitecturalSection({
   tone = 'light',
@@ -38,7 +40,7 @@ export function ArchitecturalSection({
   return (
     <Component
       className={cn(
-        'relative w-full py-16 md:py-24',
+        'relative w-full py-16 md:py-24 overflow-hidden',
         toneClasses,
         gridClass,
         withTopRule && 'border-t',
@@ -47,7 +49,10 @@ export function ArchitecturalSection({
       )}
       {...props}
     >
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      {withGridBg && (
+        <ArchitecturalGridAccents tone={tone === 'dark' ? 'dark' : 'light'} />
+      )}
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {children}
       </div>
     </Component>

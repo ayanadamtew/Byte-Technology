@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
 const cardVariants = cva(
-  'relative transition-colors duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
+  'group/card relative transition-all duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
   {
     variants: {
       surface: {
@@ -19,8 +19,9 @@ const cardVariants = cva(
           'bg-[#1A2130] text-[#F2F2EE] border-[#F2F2EE]/11',
       },
       interactive: {
-        true: 'hover:border-[#FA8112]/65 hover:bg-[#FFFFFF]',
-        darkInteractive: 'hover:border-[#FDA63A]/60 hover:bg-[#283248]',
+        true: 'hover:border-[#FA8112]/65 hover:bg-[#FFFFFF] hover:-translate-y-[2px] hover:shadow-[0_12px_32px_-8px_rgba(26,33,48,0.08)]',
+        darkInteractive:
+          'hover:border-[#FDA63A]/60 hover:bg-[#283248] hover:-translate-y-[2px] hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.28)]',
         false: '',
       },
       radius: {

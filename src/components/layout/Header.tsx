@@ -14,6 +14,7 @@ import { BrandLogo } from './BrandLogo';
  */
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [hoveredPath, setHoveredPath] = React.useState<string | null>(null);
   const location = useLocation();
 
   // Close mobile menu automatically on route change
@@ -40,24 +41,28 @@ export function Header() {
         <Link
           to="/"
           aria-label={`${BYTE_BRAND.name} Home`}
-          className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] focus-visible:ring-offset-2"
+          className="group rounded-md transition-transform duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] focus-visible:ring-offset-2"
         >
           <BrandLogo tone="light" showLocation />
         </Link>
 
-        {/* Center: Primary Desktop Navigation Links (Clean Typography, Zero Pills) */}
+        {/* Center: Primary Desktop Navigation Links with Shared Motion Hover & Active Indicators */}
         <nav
           aria-label="Primary Navigation"
-          className="hidden md:flex md:items-center md:gap-8"
+          onMouseLeave={() => setHoveredPath(null)}
+          className="hidden md:flex md:items-center md:gap-2"
         >
           {BYTE_NAVIGATION_ITEMS.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === '/'}
+              onMouseEnter={() => setHoveredPath(item.path)}
+              onFocus={() => setHoveredPath(item.path)}
+              onBlur={() => setHoveredPath(null)}
               className={({ isActive }) =>
                 cn(
-                  'relative py-2 text-sm font-medium transition-colors duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] rounded-sm',
+                  'relative px-3.5 py-2 text-sm font-medium transition-colors duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] rounded-md',
                   isActive
                     ? 'text-[#1A2130] font-semibold'
                     : 'text-[#4A5365] hover:text-[#1A2130]'
@@ -66,12 +71,20 @@ export function Header() {
             >
               {({ isActive }) => (
                 <>
-                  <span>{item.label}</span>
+                  {hoveredPath === item.path && (
+                    <motion.span
+                      layoutId="byte-header-hover-highlight"
+                      aria-hidden="true"
+                      className="absolute inset-x-1 inset-y-1 -z-10 rounded-md bg-[#1A2130]/[0.05]"
+                      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  )}
+                  <span className="relative z-10">{item.label}</span>
                   {isActive && (
                     <motion.span
                       layoutId="byte-header-active-indicator"
-                      className="absolute inset-x-0 -bottom-[17px] h-[2px] bg-[#FA8112]"
-                      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-x-3 -bottom-[15px] h-[2px] bg-[#FA8112]"
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                     />
                   )}
                 </>
@@ -123,28 +136,41 @@ export function Header() {
             className="border-b border-[#DFDFD9] bg-[#FAF9F6] px-4 pt-4 pb-6 shadow-[0_12px_32px_-8px_rgba(26,33,48,0.12)] md:hidden"
           >
             <nav aria-label="Mobile Navigation" className="flex flex-col divide-y divide-[#DFDFD9]">
-              {BYTE_NAVIGATION_ITEMS.map((item) => (
-                <NavLink
+              {BYTE_NAVIGATION_ITEMS.map((item, idx) => (
+                <motion.div
                   key={item.path}
-                  to={item.path}
-                  end={item.path === '/'}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center justify-between py-3.5 text-base font-medium transition-colors',
-                      isActive
-                        ? 'text-[#FA8112] font-semibold'
-                        : 'text-[#1A2130] hover:text-[#FA8112]'
-                    )
-                  }
+                  initial={{ opacity: 0, x: -6 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: idx * 0.03,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono text-xs text-[#687285]">
-                      {item.index}.
-                    </span>
-                    <span>{item.label}</span>
-                  </div>
-                  <ArrowUpRight className="h-4 w-4 opacity-60" aria-hidden="true" />
-                </NavLink>
+                  <NavLink
+                    to={item.path}
+                    end={item.path === '/'}
+                    className={({ isActive }) =>
+                      cn(
+                        'group flex items-center justify-between py-3.5 text-base font-medium transition-colors',
+                        isActive
+                          ? 'text-[#FA8112] font-semibold'
+                          : 'text-[#1A2130] hover:text-[#FA8112]'
+                      )
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs text-[#687285]">
+                        {item.index}.
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+                    <ArrowUpRight
+                      className="h-4 w-4 opacity-60 transition-transform duration-[180ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      aria-hidden="true"
+                    />
+                  </NavLink>
+                </motion.div>
               ))}
             </nav>
 

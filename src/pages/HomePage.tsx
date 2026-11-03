@@ -10,7 +10,7 @@ import {
   MapPin,
   ShieldCheck,
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   HOMEPAGE_HERO,
   HERO_SYSTEM_LAYERS,
@@ -30,12 +30,15 @@ import { SectionKicker, InlineMetadata } from '../components/ui/section-kicker';
 import { Button } from '../components/ui/button';
 import {
   Card,
-  CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
-  CardFooter,
 } from '../components/ui/card';
+import {
+  HeroHeadlineReveal,
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from '../components/ui/motion-primitives';
 import { ServiceSchematic } from '../components/home/ServiceSchematic';
 
 /**
@@ -98,9 +101,10 @@ export function HomePage() {
               tone="light"
             />
 
-            <h1 className="font-display text-[clamp(2.5rem,4.6vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-[#1A2130]">
-              {HOMEPAGE_HERO.headline}
-            </h1>
+            <HeroHeadlineReveal
+              text={HOMEPAGE_HERO.headline}
+              className="font-display text-[clamp(2.5rem,4.6vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-[#1A2130]"
+            />
 
             <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] px-5 py-4">
               <p className="font-display text-base font-semibold text-[#1A2130] sm:text-lg">
@@ -242,40 +246,47 @@ export function HomePage() {
                 })}
               </div>
 
-              {/* Active Layer Details Panel */}
-              <div
-                role="tabpanel"
-                aria-label={`${activeLayer.layerName} Details`}
-                className="mt-4 rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-semibold text-[#1A2130]">
-                    Active Layer {activeLayer.index} · {activeLayer.layerName}
-                  </span>
-                  <Layers className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
-                </div>
-                <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
-                  {activeLayer.description}
-                </p>
-                <ul className="mt-3 space-y-2 border-t border-[#DFDFD9] pt-3">
-                  {activeLayer.services.map((svc) => (
-                    <li
-                      key={svc.name}
-                      className="flex items-baseline justify-between gap-2 text-xs"
-                    >
-                      <span className="font-medium text-[#1A2130]">
-                        <span className="font-mono text-[#FA8112] mr-1.5">
-                          {svc.index}.
+              {/* Active Layer Details Panel with Smooth Transition */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeLayer.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  role="tabpanel"
+                  aria-label={`${activeLayer.layerName} Details`}
+                  className="mt-4 rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-semibold text-[#1A2130]">
+                      Active Layer {activeLayer.index} · {activeLayer.layerName}
+                    </span>
+                    <Layers className="h-4 w-4 text-[#FA8112]" aria-hidden="true" />
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
+                    {activeLayer.description}
+                  </p>
+                  <ul className="mt-3 space-y-2 border-t border-[#DFDFD9] pt-3">
+                    {activeLayer.services.map((svc) => (
+                      <li
+                        key={svc.name}
+                        className="flex items-baseline justify-between gap-2 text-xs"
+                      >
+                        <span className="font-medium text-[#1A2130]">
+                          <span className="font-mono text-[#FA8112] mr-1.5">
+                            {svc.index}.
+                          </span>
+                          {svc.name}
                         </span>
-                        {svc.name}
-                      </span>
-                      <span className="text-right text-[11px] text-[#687285]">
-                        {svc.role}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                        <span className="text-right text-[11px] text-[#687285]">
+                          {svc.role}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>
@@ -287,7 +298,7 @@ export function HomePage() {
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           {/* Left 5 Columns: Company Introduction Narrative */}
-          <div className="lg:col-span-5 space-y-5">
+          <ScrollReveal className="lg:col-span-5 space-y-5">
             <SectionKicker
               index="02"
               label="Who We Partner With"
@@ -315,49 +326,51 @@ export function HomePage() {
               >
                 <span>Read More About Our Mission in Ethiopia</span>
                 <ArrowRight
-                  className="h-4 w-4 text-[#FA8112] transition-transform group-hover:translate-x-1"
+                  className="h-4 w-4 text-[#FA8112] transition-transform duration-[180ms] group-hover:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Right 7 Columns: 4 Target Customer Archetypes Grid */}
-          <div className="lg:col-span-7 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <StaggerContainer className="lg:col-span-7 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {TARGET_AUDIENCE_SEGMENTS.map((segment) => (
-              <Card
-                key={segment.index}
-                surface="pure"
-                radius="lg"
-                padding="sm"
-                className="flex flex-col justify-between border-[#DFDFD9]"
-              >
-                <div className="space-y-3">
-                  <InlineMetadata
-                    tone="light"
-                    items={[`Profile ${segment.index}`, segment.who]}
-                  />
-                  <h3 className="font-display text-lg font-semibold text-[#1A2130]">
-                    {segment.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#4A5365]">
-                    {segment.challengeSolved}
-                  </p>
-                </div>
+              <StaggerItem key={segment.index} className="h-full">
+                <Card
+                  surface="pure"
+                  interactive
+                  radius="lg"
+                  padding="sm"
+                  className="flex h-full flex-col justify-between border-[#DFDFD9]"
+                >
+                  <div className="space-y-3">
+                    <InlineMetadata
+                      tone="light"
+                      items={[`Profile ${segment.index}`, segment.who]}
+                    />
+                    <h3 className="font-display text-lg font-semibold text-[#1A2130]">
+                      {segment.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-[#4A5365]">
+                      {segment.challengeSolved}
+                    </p>
+                  </div>
 
-                <div className="mt-5 border-t border-[#DFDFD9] pt-3">
-                  <span className="block font-mono text-[11px] text-[#687285]">
-                    Primary Capability Focus:
-                  </span>
-                  <InlineMetadata
-                    tone="light"
-                    className="mt-1 text-[#1A2130] font-medium"
-                    items={segment.primaryCapabilities}
-                  />
-                </div>
-              </Card>
+                  <div className="mt-5 border-t border-[#DFDFD9] pt-3">
+                    <span className="block font-mono text-[11px] text-[#687285]">
+                      Primary Capability Focus:
+                    </span>
+                    <InlineMetadata
+                      tone="light"
+                      className="mt-1 text-[#1A2130] font-medium"
+                      items={segment.primaryCapabilities}
+                    />
+                  </div>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -370,7 +383,7 @@ export function HomePage() {
         withBottomRule
       >
         <div className="space-y-12">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <ScrollReveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl space-y-3">
               <SectionKicker
                 index="03"
@@ -392,13 +405,16 @@ export function HomePage() {
                 className="group inline-flex items-center gap-1.5 text-sm font-semibold text-[#FA8112] hover:text-[#1A2130]"
               >
                 <span>View Full Services Specification</span>
-                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                <ArrowUpRight
+                  className="h-4 w-4 transition-transform duration-[180ms] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Asymmetric 12-Column Bento Matrix (Row 1: 4+4+4, Row 2: 8+4, Row 3: 6+6) */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-12">
             {HOMEPAGE_SERVICES_BENTO.map((service) => {
               const colSpanClass =
                 service.gridSpan === 'wide'
@@ -408,82 +424,86 @@ export function HomePage() {
                     : 'md:col-span-6 lg:col-span-4';
 
               return (
-                <Card
+                <StaggerItem
                   key={service.id}
-                  surface="light"
-                  interactive
-                  radius="lg"
-                  padding="default"
-                  className={cn('flex flex-col justify-between', colSpanClass)}
+                  className={cn('flex', colSpanClass)}
                 >
-                  <div className="space-y-5">
-                    <div className="flex items-center justify-between gap-2">
-                      <InlineMetadata
-                        tone="light"
-                        items={[service.index, service.pillar]}
-                      />
-                    </div>
-
-                    {/* Custom Architectural SVG Schematic */}
-                    <ServiceSchematic type={service.schematicType} />
-
-                    <div className="space-y-2">
-                      <CardTitle className="text-xl text-[#1A2130]">
-                        {service.index}. {service.name}
-                      </CardTitle>
-                      <p className="font-display text-sm font-medium text-[#1A2130]/90">
-                        {service.headline}
-                      </p>
-                      <CardDescription className="text-sm leading-relaxed text-[#4A5365]">
-                        {service.summary}
-                      </CardDescription>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-4 border-t border-[#DFDFD9] pt-4">
-                    <div>
-                      <span className="font-mono text-[11px] font-medium text-[#687285]">
-                        Key Deliverables:
-                      </span>
-                      <ul
-                        className={cn(
-                          'mt-2 grid gap-1.5 text-xs text-[#1A2130]',
-                          service.gridSpan === 'wide' || service.gridSpan === 'half'
-                            ? 'grid-cols-1 sm:grid-cols-2'
-                            : 'grid-cols-1'
-                        )}
-                      >
-                        {service.deliverables.map((item) => (
-                          <li key={item} className="flex items-baseline gap-2">
-                            <span
-                              aria-hidden="true"
-                              className="font-mono text-[#FA8112]"
-                            >
-                              —
-                            </span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <Link
-                        to={`/contact?service=${encodeURIComponent(service.id)}`}
-                        className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#FA8112]"
-                      >
-                        <span>Inquire About {service.name}</span>
-                        <ArrowRight
-                          className="h-3.5 w-3.5 text-[#FA8112] transition-transform group-hover:translate-x-1"
-                          aria-hidden="true"
+                  <Card
+                    surface="light"
+                    interactive
+                    radius="lg"
+                    padding="default"
+                    className="flex w-full flex-col justify-between"
+                  >
+                    <div className="space-y-5">
+                      <div className="flex items-center justify-between gap-2">
+                        <InlineMetadata
+                          tone="light"
+                          items={[service.index, service.pillar]}
                         />
-                      </Link>
+                      </div>
+
+                      {/* Custom Architectural SVG Schematic */}
+                      <ServiceSchematic type={service.schematicType} />
+
+                      <div className="space-y-2">
+                        <CardTitle className="text-xl text-[#1A2130]">
+                          {service.index}. {service.name}
+                        </CardTitle>
+                        <p className="font-display text-sm font-medium text-[#1A2130]/90">
+                          {service.headline}
+                        </p>
+                        <CardDescription className="text-sm leading-relaxed text-[#4A5365]">
+                          {service.summary}
+                        </CardDescription>
+                      </div>
                     </div>
-                  </div>
-                </Card>
+
+                    <div className="mt-6 space-y-4 border-t border-[#DFDFD9] pt-4">
+                      <div>
+                        <span className="font-mono text-[11px] font-medium text-[#687285]">
+                          Key Deliverables:
+                        </span>
+                        <ul
+                          className={cn(
+                            'mt-2 grid gap-1.5 text-xs text-[#1A2130]',
+                            service.gridSpan === 'wide' || service.gridSpan === 'half'
+                              ? 'grid-cols-1 sm:grid-cols-2'
+                              : 'grid-cols-1'
+                          )}
+                        >
+                          {service.deliverables.map((item) => (
+                            <li key={item} className="flex items-baseline gap-2">
+                              <span
+                                aria-hidden="true"
+                                className="font-mono text-[#FA8112]"
+                              >
+                                —
+                              </span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <Link
+                          to={`/contact?service=${encodeURIComponent(service.id)}`}
+                          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A2130] hover:text-[#FA8112]"
+                        >
+                          <span>Inquire About {service.name}</span>
+                          <ArrowRight
+                            className="h-3.5 w-3.5 text-[#FA8112] transition-transform duration-[180ms] group-hover:translate-x-1"
+                            aria-hidden="true"
+                          />
+                        </Link>
+                      </div>
+                    </div>
+                  </Card>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -493,7 +513,7 @@ export function HomePage() {
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="space-y-10">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <ScrollReveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl space-y-3">
               <SectionKicker
                 index="04"
@@ -509,7 +529,7 @@ export function HomePage() {
               digital customer portals, AI automation, and cloud modernization for
               organizations in {BYTE_BRAND.location}.
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* Interactive Segmented Blueprint Selector */}
           <div
@@ -527,13 +547,21 @@ export function HomePage() {
                   aria-selected={isSelected}
                   onClick={() => setActiveBlueprintId(bp.id)}
                   className={cn(
-                    'flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-all duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
+                    'relative flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-colors duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
                     isSelected
-                      ? 'bg-[#FFFFFF] text-[#1A2130] shadow-[0_1px_3px_rgba(26,33,48,0.08)]'
+                      ? 'text-[#1A2130]'
                       : 'text-[#4A5365] hover:text-[#1A2130]'
                   )}
                 >
-                  <span>
+                  {isSelected && (
+                    <motion.span
+                      layoutId="home-blueprint-active-tab"
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-md bg-[#FFFFFF] shadow-[0_1px_3px_rgba(26,33,48,0.08)]"
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  )}
+                  <span className="relative z-10">
                     <span className="font-mono text-[#FA8112] mr-1.5">
                       {bp.index}.
                     </span>
@@ -542,7 +570,7 @@ export function HomePage() {
                   {isSelected && (
                     <span
                       aria-hidden="true"
-                      className="h-1.5 w-1.5 bg-[#FA8112]"
+                      className="relative z-10 h-1.5 w-1.5 bg-[#FA8112]"
                     />
                   )}
                 </button>
@@ -551,136 +579,149 @@ export function HomePage() {
           </div>
 
           {/* Active Solution Blueprint Detail Panel */}
-          <motion.div
-            key={activeBlueprint.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            role="tabpanel"
-            aria-label={activeBlueprint.title}
-            className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
-          >
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-              {/* Left 5 Columns: Problem vs. Byte Solution Narrative */}
-              <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <InlineMetadata
-                    tone="light"
-                    items={[
-                      `Blueprint ${activeBlueprint.index}`,
-                      activeBlueprint.targetOrganization,
-                    ]}
-                  />
-                  <h3 className="font-display text-2xl font-bold leading-snug tracking-tight text-[#1A2130]">
-                    {activeBlueprint.title}
-                  </h3>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeBlueprint.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+              role="tabpanel"
+              aria-label={activeBlueprint.title}
+              className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
+            >
+              <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+                {/* Left 5 Columns: Problem vs. Byte Solution Narrative */}
+                <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+                  <div className="space-y-4">
+                    <InlineMetadata
+                      tone="light"
+                      items={[
+                        `Blueprint ${activeBlueprint.index}`,
+                        activeBlueprint.targetOrganization,
+                      ]}
+                    />
+                    <h3 className="font-display text-2xl font-bold leading-snug tracking-tight text-[#1A2130]">
+                      {activeBlueprint.title}
+                    </h3>
 
-                  <div className="space-y-3 pt-2">
-                    <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
-                      <span className="font-mono text-[11px] font-semibold text-[#687285]">
-                        LEGACY BOTTLENECK
-                      </span>
-                      <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
-                        {activeBlueprint.legacyBottleneck}
-                      </p>
-                    </div>
-
-                    <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
-                      <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
-                        BYTE TECHNOLOGY ARCHITECTURE
-                      </span>
-                      <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
-                        {activeBlueprint.byteArchitecture}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 border-t border-[#DFDFD9] pt-5">
-                  <div>
-                    <span className="font-mono text-xs text-[#687285]">
-                      Capabilities Combined in This Architecture:
-                    </span>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[#1A2130]">
-                      {activeBlueprint.servicesCombined.map((svc, idx) => (
-                        <React.Fragment key={svc.id}>
-                          <span>
-                            <span className="font-mono text-[#FA8112] mr-1">
-                              {svc.index}.
-                            </span>
-                            {svc.name}
-                          </span>
-                          {idx < activeBlueprint.servicesCombined.length - 1 && (
-                            <span aria-hidden="true" className="text-[#687285]">
-                              +
-                            </span>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button asChild variant="navy" size="default">
-                    <Link
-                      to={`/contact?service=${encodeURIComponent(
-                        activeBlueprint.servicesCombined[0].id
-                      )}`}
-                    >
-                      <span>Discuss This Architecture for Your Organization</span>
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Right 7 Columns: 3-Stage System Flow Schematic */}
-              <div className="lg:col-span-7 flex flex-col justify-between rounded-lg border border-[#DFDFD9] bg-[#F2F2EE] p-6 sm:p-8">
-                <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-4">
-                  <span className="font-mono text-xs font-semibold text-[#1A2130]">
-                    SYSTEM ARCHITECTURE FLOW · {activeBlueprint.tabLabel.toUpperCase()}
-                  </span>
-                  <span className="font-mono text-xs text-[#FA8112]">
-                    3-Tier Execution
-                  </span>
-                </div>
-
-                <div className="my-6 space-y-4">
-                  {activeBlueprint.systemNodes.map((node, index) => (
-                    <div key={node.step} className="relative">
-                      <div className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4 sm:p-5">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="font-mono text-xs font-semibold text-[#FA8112]">
-                            0{index + 1} · {node.step}
-                          </span>
-                          <span className="font-display text-sm font-bold text-[#1A2130]">
-                            {node.label}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-xs leading-relaxed text-[#4A5365]">
-                          {node.detail}
+                    <div className="space-y-3 pt-2">
+                      <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
+                        <span className="font-mono text-[11px] font-semibold text-[#687285]">
+                          LEGACY BOTTLENECK
+                        </span>
+                        <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
+                          {activeBlueprint.legacyBottleneck}
                         </p>
                       </div>
-                      {index < activeBlueprint.systemNodes.length - 1 && (
-                        <div
-                          aria-hidden="true"
-                          className="ml-6 h-4 w-[1.5px] bg-[#FA8112]"
-                        />
-                      )}
+
+                      <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
+                        <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
+                          BYTE TECHNOLOGY ARCHITECTURE
+                        </span>
+                        <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
+                          {activeBlueprint.byteArchitecture}
+                        </p>
+                      </div>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="space-y-4 border-t border-[#DFDFD9] pt-5">
+                    <div>
+                      <span className="font-mono text-xs text-[#687285]">
+                        Capabilities Combined in This Architecture:
+                      </span>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-[#1A2130]">
+                        {activeBlueprint.servicesCombined.map((svc, idx) => (
+                          <React.Fragment key={svc.id}>
+                            <span>
+                              <span className="font-mono text-[#FA8112] mr-1">
+                                {svc.index}.
+                              </span>
+                              {svc.name}
+                            </span>
+                            {idx < activeBlueprint.servicesCombined.length - 1 && (
+                              <span aria-hidden="true" className="text-[#687285]">
+                                +
+                              </span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button asChild variant="navy" size="default">
+                      <Link
+                        to={`/contact?service=${encodeURIComponent(
+                          activeBlueprint.servicesCombined[0].id
+                        )}`}
+                      >
+                        <span>Discuss This Architecture for Your Organization</span>
+                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="rounded-md bg-[#1A2130] px-5 py-4 text-[#F2F2EE]">
-                  <span className="font-mono text-[11px] font-semibold text-[#FDA63A]">
-                    OPERATIONAL OUTCOME
-                  </span>
-                  <p className="mt-1 text-sm leading-relaxed text-[#F2F2EE]">
-                    {activeBlueprint.operationalOutcome}
-                  </p>
+                {/* Right 7 Columns: 3-Stage System Flow Schematic */}
+                <div className="lg:col-span-7 flex flex-col justify-between rounded-lg border border-[#DFDFD9] bg-[#F2F2EE] p-6 sm:p-8">
+                  <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-4">
+                    <span className="font-mono text-xs font-semibold text-[#1A2130]">
+                      SYSTEM ARCHITECTURE FLOW · {activeBlueprint.tabLabel.toUpperCase()}
+                    </span>
+                    <span className="font-mono text-xs text-[#FA8112]">
+                      3-Tier Execution
+                    </span>
+                  </div>
+
+                  <div className="my-6 space-y-4">
+                    {activeBlueprint.systemNodes.map((node, index) => (
+                      <motion.div
+                        key={node.step}
+                        initial={{ opacity: 0, x: 8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.25,
+                          delay: index * 0.055,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="relative"
+                      >
+                        <div className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4 sm:p-5 transition-colors hover:border-[#FA8112]/50">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                              0{index + 1} · {node.step}
+                            </span>
+                            <span className="font-display text-sm font-bold text-[#1A2130]">
+                              {node.label}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-xs leading-relaxed text-[#4A5365]">
+                            {node.detail}
+                          </p>
+                        </div>
+                        {index < activeBlueprint.systemNodes.length - 1 && (
+                          <div
+                            aria-hidden="true"
+                            className="ml-6 h-4 w-[1.5px] bg-[#FA8112]"
+                          />
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-md bg-[#1A2130] px-5 py-4 text-[#F2F2EE]">
+                    <span className="font-mono text-[11px] font-semibold text-[#FDA63A]">
+                      OPERATIONAL OUTCOME
+                    </span>
+                    <p className="mt-1 text-sm leading-relaxed text-[#F2F2EE]">
+                      {activeBlueprint.operationalOutcome}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </ArchitecturalSection>
 
@@ -695,7 +736,7 @@ export function HomePage() {
       >
         <div className="space-y-16">
           {/* Top Mission Mandate Banner */}
-          <div className="grid grid-cols-1 gap-10 border-b border-[#F2F2EE]/11 pb-14 lg:grid-cols-12 lg:items-end">
+          <ScrollReveal className="grid grid-cols-1 gap-10 border-b border-[#F2F2EE]/11 pb-14 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-7 space-y-4">
               <SectionKicker
                 index="05"
@@ -718,39 +759,40 @@ export function HomePage() {
                 items={['Modern', 'Professional', 'Innovative', 'Trustworthy', 'Ambitious']}
               />
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* 4 Architectural Pillars of Trust */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {WHY_BYTE_PILLARS.map((pillar) => (
-              <Card
-                key={pillar.index}
-                surface="dark"
-                interactive="darkInteractive"
-                radius="lg"
-                padding="default"
-                className="flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold text-[#FDA63A]">
-                      {pillar.index} · {pillar.attribute}
-                    </span>
-                    <ShieldCheck
-                      className="h-4 w-4 text-[#FA8112]"
-                      aria-hidden="true"
-                    />
+              <StaggerItem key={pillar.index} className="h-full">
+                <Card
+                  surface="dark"
+                  interactive="darkInteractive"
+                  radius="lg"
+                  padding="default"
+                  className="flex h-full flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-xs font-semibold text-[#FDA63A]">
+                        {pillar.index} · {pillar.attribute}
+                      </span>
+                      <ShieldCheck
+                        className="h-4 w-4 text-[#FA8112]"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <h3 className="font-display text-xl font-semibold text-[#F2F2EE]">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-[#B0B8C8]">
+                      {pillar.description}
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-semibold text-[#F2F2EE]">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#B0B8C8]">
-                    {pillar.description}
-                  </p>
-                </div>
-              </Card>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -759,7 +801,7 @@ export function HomePage() {
       ====================================================================== */}
       <ArchitecturalSection tone="light" withBottomRule>
         <div className="space-y-12">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <ScrollReveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div className="max-w-2xl space-y-3">
               <SectionKicker
                 index="06"
@@ -782,62 +824,64 @@ export function HomePage() {
               >
                 <span>Explore Our Full Engineering Approach</span>
                 <ArrowRight
-                  className="h-4 w-4 text-[#FA8112] transition-transform group-hover:translate-x-1"
+                  className="h-4 w-4 text-[#FA8112] transition-transform duration-[180ms] group-hover:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {DEVELOPMENT_PROCESS_PHASES.map((step) => (
-              <Card
-                key={step.phase}
-                surface="pure"
-                radius="lg"
-                padding="default"
-                className="flex flex-col justify-between border-[#DFDFD9]"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-3">
-                    <span className="font-mono text-sm font-bold text-[#FA8112]">
-                      Phase {step.phase}
-                    </span>
-                    <span className="font-mono text-[11px] text-[#687285]">
-                      {step.subtitle}
-                    </span>
+              <StaggerItem key={step.phase} className="h-full">
+                <Card
+                  surface="pure"
+                  interactive
+                  radius="lg"
+                  padding="default"
+                  className="flex h-full flex-col justify-between border-[#DFDFD9]"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-3">
+                      <span className="font-mono text-sm font-bold text-[#FA8112]">
+                        Phase {step.phase}
+                      </span>
+                      <span className="font-mono text-[11px] text-[#687285]">
+                        {step.subtitle}
+                      </span>
+                    </div>
+
+                    <h3 className="font-display text-lg font-bold leading-snug text-[#1A2130]">
+                      {step.title}
+                    </h3>
+
+                    <p className="text-sm leading-relaxed text-[#4A5365]">
+                      {step.description}
+                    </p>
                   </div>
 
-                  <h3 className="font-display text-lg font-bold leading-snug text-[#1A2130]">
-                    {step.title}
-                  </h3>
-
-                  <p className="text-sm leading-relaxed text-[#4A5365]">
-                    {step.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 border-t border-[#DFDFD9] pt-4">
-                  <span className="font-mono text-[11px] font-medium text-[#687285]">
-                    Phase Deliverables:
-                  </span>
-                  <ul className="mt-2 space-y-1.5 text-xs text-[#1A2130]">
-                    {step.keyOutputs.map((output) => (
-                      <li key={output} className="flex items-baseline gap-2">
-                        <span
-                          aria-hidden="true"
-                          className="font-mono text-[#FA8112]"
-                        >
-                          ·
-                        </span>
-                        <span>{output}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Card>
+                  <div className="mt-6 border-t border-[#DFDFD9] pt-4">
+                    <span className="font-mono text-[11px] font-medium text-[#687285]">
+                      Phase Deliverables:
+                    </span>
+                    <ul className="mt-2 space-y-1.5 text-xs text-[#1A2130]">
+                      {step.keyOutputs.map((output) => (
+                        <li key={output} className="flex items-baseline gap-2">
+                          <span
+                            aria-hidden="true"
+                            className="font-mono text-[#FA8112]"
+                          >
+                            ·
+                          </span>
+                          <span>{output}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -850,7 +894,7 @@ export function HomePage() {
         withBottomRule={false}
         className="py-20 md:py-28"
       >
-        <div className="rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-6 sm:p-10 lg:p-12">
+        <ScrollReveal className="rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-6 sm:p-10 lg:p-12">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center">
             {/* Left 7 Columns: Consultation Headline & Direct Executive Contact */}
             <div className="lg:col-span-7 space-y-6">
@@ -974,7 +1018,7 @@ export function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
     </div>
   );

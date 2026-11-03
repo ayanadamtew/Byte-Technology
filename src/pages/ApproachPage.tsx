@@ -6,7 +6,7 @@ import {
   FileCode2,
   ShieldCheck,
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   FEATURED_SOLUTION_BLUEPRINTS,
   DEVELOPMENT_PROCESS_PHASES,
@@ -19,6 +19,12 @@ import { ArchitecturalSection, GridCrosshair } from '../components/ui/architectu
 import { SectionKicker, InlineMetadata } from '../components/ui/section-kicker';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
+import {
+  HeroHeadlineReveal,
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from '../components/ui/motion-primitives';
 
 /**
  * BYTE TECHNOLOGY — SOLUTIONS & APPROACH PAGE (/approach)
@@ -61,9 +67,10 @@ export function ApproachPage() {
               tone="light"
             />
 
-            <h1 className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]">
-              How Byte Technology Architects, Builds, and Scales Enterprise Systems.
-            </h1>
+            <HeroHeadlineReveal
+              text="How Byte Technology Architects, Builds, and Scales Enterprise Systems."
+              className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]"
+            />
 
             <p className="max-w-2xl text-base leading-relaxed text-[#4A5365] sm:text-lg">
               Strong software requires disciplined execution. We bridge strategic
@@ -142,7 +149,7 @@ export function ApproachPage() {
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="space-y-10">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="02"
               label="Applied Systems Architecture"
@@ -156,7 +163,7 @@ export function ApproachPage() {
               in {BYTE_BRAND.location} from fragmented legacy bottlenecks to unified
               digital systems.
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* Interactive Scenario Selector */}
           <div
@@ -174,13 +181,21 @@ export function ApproachPage() {
                   aria-selected={isSelected}
                   onClick={() => setSelectedBlueprintId(bp.id)}
                   className={cn(
-                    'flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-all duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
+                    'relative flex items-center justify-between rounded-md px-4 py-3 text-left text-xs font-semibold transition-colors duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
                     isSelected
-                      ? 'bg-[#FFFFFF] text-[#1A2130] shadow-xs'
+                      ? 'text-[#1A2130]'
                       : 'text-[#4A5365] hover:text-[#1A2130]'
                   )}
                 >
-                  <span>
+                  {isSelected && (
+                    <motion.span
+                      layoutId="approach-blueprint-active-tab"
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-md bg-[#FFFFFF] shadow-xs"
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  )}
+                  <span className="relative z-10">
                     <span className="font-mono text-[#FA8112] mr-1.5">
                       {bp.index}.
                     </span>
@@ -191,90 +206,104 @@ export function ApproachPage() {
             })}
           </div>
 
-          <div
-            role="tabpanel"
-            aria-label={activeBlueprint.title}
-            className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
-          >
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-              <div className="lg:col-span-5 space-y-5">
-                <InlineMetadata
-                  tone="light"
-                  items={[
-                    `Blueprint ${activeBlueprint.index}`,
-                    activeBlueprint.targetOrganization,
-                  ]}
-                />
-                <h3 className="font-display text-2xl font-bold text-[#1A2130]">
-                  {activeBlueprint.title}
-                </h3>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeBlueprint.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              role="tabpanel"
+              aria-label={activeBlueprint.title}
+              className="rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] p-6 sm:p-8 lg:p-10"
+            >
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                <div className="lg:col-span-5 space-y-5">
+                  <InlineMetadata
+                    tone="light"
+                    items={[
+                      `Blueprint ${activeBlueprint.index}`,
+                      activeBlueprint.targetOrganization,
+                    ]}
+                  />
+                  <h3 className="font-display text-2xl font-bold text-[#1A2130]">
+                    {activeBlueprint.title}
+                  </h3>
 
-                <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
-                  <span className="font-mono text-[11px] font-semibold text-[#687285]">
-                    BEFORE · LEGACY BOTTLENECK
-                  </span>
-                  <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
-                    {activeBlueprint.legacyBottleneck}
-                  </p>
-                </div>
+                  <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-4">
+                    <span className="font-mono text-[11px] font-semibold text-[#687285]">
+                      BEFORE · LEGACY BOTTLENECK
+                    </span>
+                    <p className="mt-1 text-sm leading-relaxed text-[#4A5365]">
+                      {activeBlueprint.legacyBottleneck}
+                    </p>
+                  </div>
 
-                <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
-                  <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
-                    AFTER · BYTE TECHNOLOGY ARCHITECTURE
-                  </span>
-                  <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
-                    {activeBlueprint.byteArchitecture}
-                  </p>
-                </div>
+                  <div className="rounded-md border border-[#FA8112]/40 bg-[#FAF9F6] p-4">
+                    <span className="font-mono text-[11px] font-semibold text-[#FA8112]">
+                      AFTER · BYTE TECHNOLOGY ARCHITECTURE
+                    </span>
+                    <p className="mt-1 text-sm leading-relaxed text-[#1A2130]">
+                      {activeBlueprint.byteArchitecture}
+                    </p>
+                  </div>
 
-                <Button asChild variant="navy" size="default">
-                  <Link
-                    to={`/contact?service=${encodeURIComponent(
-                      activeBlueprint.servicesCombined[0].id
-                    )}`}
-                  >
-                    <span>Plan This Architecture with Our Team</span>
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </Link>
-                </Button>
-              </div>
-
-              <div className="lg:col-span-7 flex flex-col justify-between rounded-lg border border-[#DFDFD9] bg-[#F2F2EE] p-6">
-                <div className="space-y-4">
-                  <span className="font-mono text-xs font-semibold text-[#1A2130]">
-                    3-TIER ARCHITECTURAL EXECUTION
-                  </span>
-                  {activeBlueprint.systemNodes.map((node, idx) => (
-                    <div
-                      key={node.step}
-                      className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
+                  <Button asChild variant="navy" size="default">
+                    <Link
+                      to={`/contact?service=${encodeURIComponent(
+                        activeBlueprint.servicesCombined[0].id
+                      )}`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs font-semibold text-[#FA8112]">
-                          0{idx + 1} · {node.step}
-                        </span>
-                        <span className="font-display text-sm font-bold text-[#1A2130]">
-                          {node.label}
-                        </span>
-                      </div>
-                      <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
-                        {node.detail}
-                      </p>
-                    </div>
-                  ))}
+                      <span>Plan This Architecture with Our Team</span>
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
                 </div>
 
-                <div className="mt-6 rounded-md bg-[#1A2130] p-4 text-[#F2F2EE]">
-                  <span className="font-mono text-[11px] font-semibold text-[#FDA63A]">
-                    OPERATIONAL OUTCOME
-                  </span>
-                  <p className="mt-1 text-sm text-[#F2F2EE]">
-                    {activeBlueprint.operationalOutcome}
-                  </p>
+                <div className="lg:col-span-7 flex flex-col justify-between rounded-lg border border-[#DFDFD9] bg-[#F2F2EE] p-6">
+                  <div className="space-y-4">
+                    <span className="font-mono text-xs font-semibold text-[#1A2130]">
+                      3-TIER ARCHITECTURAL EXECUTION
+                    </span>
+                    {activeBlueprint.systemNodes.map((node, idx) => (
+                      <motion.div
+                        key={node.step}
+                        initial={{ opacity: 0, x: 8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.24,
+                          delay: idx * 0.05,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-xs font-semibold text-[#FA8112]">
+                            0{idx + 1} · {node.step}
+                          </span>
+                          <span className="font-display text-sm font-bold text-[#1A2130]">
+                            {node.label}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
+                          {node.detail}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 rounded-md bg-[#1A2130] p-4 text-[#F2F2EE]">
+                    <span className="font-mono text-[11px] font-semibold text-[#FDA63A]">
+                      OPERATIONAL OUTCOME
+                    </span>
+                    <p className="mt-1 text-sm text-[#F2F2EE]">
+                      {activeBlueprint.operationalOutcome}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </ArchitecturalSection>
 
@@ -288,7 +317,7 @@ export function ApproachPage() {
         className="py-20 md:py-28"
       >
         <div className="space-y-12">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="03"
               label="Lifecycle Governance"
@@ -301,53 +330,55 @@ export function ApproachPage() {
               Every project is structured into four transparent phases with clear
               deliverables, architectural reviews, and executive checkpoints.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {DEVELOPMENT_PROCESS_PHASES.map((phase) => (
-              <Card
-                key={phase.phase}
-                surface="dark"
-                radius="lg"
-                padding="default"
-                className="flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F2F2EE]/11 pb-3">
-                    <span className="font-mono text-sm font-bold text-[#FDA63A]">
-                      Phase {phase.phase}
-                    </span>
-                    <span className="font-mono text-xs text-[#B0B8C8]">
-                      {phase.subtitle}
-                    </span>
+              <StaggerItem key={phase.phase} className="h-full">
+                <Card
+                  surface="dark"
+                  interactive="darkInteractive"
+                  radius="lg"
+                  padding="default"
+                  className="flex h-full flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-[#F2F2EE]/11 pb-3">
+                      <span className="font-mono text-sm font-bold text-[#FDA63A]">
+                        Phase {phase.phase}
+                      </span>
+                      <span className="font-mono text-xs text-[#B0B8C8]">
+                        {phase.subtitle}
+                      </span>
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-[#F2F2EE]">
+                      {phase.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-[#B0B8C8]">
+                      {phase.description}
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-[#F2F2EE]">
-                    {phase.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#B0B8C8]">
-                    {phase.description}
-                  </p>
-                </div>
 
-                <div className="mt-6 border-t border-[#F2F2EE]/11 pt-4">
-                  <span className="font-mono text-xs font-semibold text-[#FDA63A]">
-                    Key Phase Deliverables:
-                  </span>
-                  <ul className="mt-2.5 space-y-2 text-xs text-[#F2F2EE]">
-                    {phase.keyOutputs.map((out) => (
-                      <li key={out} className="flex items-start gap-2">
-                        <CheckCircle2
-                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FA8112]"
-                          aria-hidden="true"
-                        />
-                        <span>{out}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Card>
+                  <div className="mt-6 border-t border-[#F2F2EE]/11 pt-4">
+                    <span className="font-mono text-xs font-semibold text-[#FDA63A]">
+                      Key Phase Deliverables:
+                    </span>
+                    <ul className="mt-2.5 space-y-2 text-xs text-[#F2F2EE]">
+                      {phase.keyOutputs.map((out) => (
+                        <li key={out} className="flex items-start gap-2">
+                          <CheckCircle2
+                            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FA8112]"
+                            aria-hidden="true"
+                          />
+                          <span>{out}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -356,7 +387,7 @@ export function ApproachPage() {
       ====================================================================== */}
       <ArchitecturalSection tone="light" withBottomRule>
         <div className="space-y-12">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="04"
               label="Engineering Quality & Security"
@@ -369,55 +400,57 @@ export function ApproachPage() {
               Correctness, security, maintainability, and requirement compliance
               govern every system we architect.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {ENGINEERING_STANDARDS.map((std) => (
-              <Card
-                key={std.index}
-                surface="pure"
-                radius="lg"
-                padding="default"
-                className="flex flex-col justify-between border-[#DFDFD9]"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <InlineMetadata
-                      tone="light"
-                      items={[`Standard ${std.index}`, std.focus]}
-                    />
-                    <ShieldCheck
-                      className="h-4 w-4 text-[#FA8112]"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <h3 className="font-display text-xl font-bold text-[#1A2130]">
-                    {std.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#4A5365]">
-                    {std.description}
-                  </p>
-                </div>
-
-                <ul className="mt-6 space-y-2 border-t border-[#DFDFD9] pt-4 text-xs text-[#1A2130]">
-                  {std.practices.map((practice) => (
-                    <li key={practice} className="flex items-start gap-2">
-                      <span
+              <StaggerItem key={std.index} className="h-full">
+                <Card
+                  surface="pure"
+                  interactive
+                  radius="lg"
+                  padding="default"
+                  className="flex h-full flex-col justify-between border-[#DFDFD9]"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <InlineMetadata
+                        tone="light"
+                        items={[`Standard ${std.index}`, std.focus]}
+                      />
+                      <ShieldCheck
+                        className="h-4 w-4 text-[#FA8112]"
                         aria-hidden="true"
-                        className="font-mono font-bold text-[#FA8112]"
-                      >
-                        —
-                      </span>
-                      <span>{practice}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
+                      />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-[#1A2130]">
+                      {std.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-[#4A5365]">
+                      {std.description}
+                    </p>
+                  </div>
+
+                  <ul className="mt-6 space-y-2 border-t border-[#DFDFD9] pt-4 text-xs text-[#1A2130]">
+                    {std.practices.map((practice) => (
+                      <li key={practice} className="flex items-start gap-2">
+                        <span
+                          aria-hidden="true"
+                          className="font-mono font-bold text-[#FA8112]"
+                        >
+                          —
+                        </span>
+                        <span>{practice}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
 
           {/* Explicit Verified Case Study & Internal Demo Placeholder Block */}
-          <div className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-6 sm:p-8">
+          <ScrollReveal className="rounded-lg border border-dashed border-[#1A2130]/30 bg-[#FAF9F6] p-6 sm:p-8">
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#FA8112]">
@@ -432,7 +465,7 @@ export function ApproachPage() {
                 <Link to="/contact">Request Live Technical Walkthrough</Link>
               </Button>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </ArchitecturalSection>
 
@@ -445,7 +478,7 @@ export function ApproachPage() {
         withBottomRule={false}
         className="py-16 md:py-24"
       >
-        <div className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
+        <ScrollReveal className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
           <div className="max-w-2xl space-y-3">
             <SectionKicker
               index="05"
@@ -467,7 +500,7 @@ export function ApproachPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Button>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
     </div>
   );

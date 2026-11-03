@@ -8,6 +8,12 @@ import { ArchitecturalSection, GridCrosshair } from '../components/ui/architectu
 import { SectionKicker, InlineMetadata } from '../components/ui/section-kicker';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
+import {
+  HeroHeadlineReveal,
+  ScrollReveal,
+  StaggerContainer,
+  StaggerItem,
+} from '../components/ui/motion-primitives';
 import { BrandLogo } from '../components/layout/BrandLogo';
 
 /**
@@ -46,9 +52,10 @@ export function AboutPage() {
               tone="light"
             />
 
-            <h1 className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]">
-              Advancing Ethiopia’s Digital Transformation Through Engineering Excellence.
-            </h1>
+            <HeroHeadlineReveal
+              text="Advancing Ethiopia’s Digital Transformation Through Engineering Excellence."
+              className="font-display text-[clamp(2.25rem,4vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#1A2130]"
+            />
 
             <blockquote className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] p-6">
               <p className="font-display text-xl font-bold text-[#1A2130] sm:text-2xl">
@@ -150,7 +157,7 @@ export function AboutPage() {
         withBottomRule
         className="py-20 md:py-28"
       >
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
+        <ScrollReveal className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
           <div className="lg:col-span-6 space-y-5">
             <SectionKicker
               index="02"
@@ -179,7 +186,7 @@ export function AboutPage() {
               serve its community multiplies.
             </p>
           </div>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
 
       {/* =====================================================================
@@ -187,7 +194,7 @@ export function AboutPage() {
       ====================================================================== */}
       <ArchitecturalSection tone="ivory" withBottomRule>
         <div className="space-y-12">
-          <div className="max-w-3xl space-y-3">
+          <ScrollReveal className="max-w-3xl space-y-3">
             <SectionKicker
               index="03"
               label="Brand & Engineering DNA"
@@ -200,64 +207,72 @@ export function AboutPage() {
               Our work is guided by five core commitments that define how we
               architect software and collaborate with organizational leaders.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {ABOUT_BRAND_PRINCIPLES.map((item) => (
+              <StaggerItem key={item.index} className="h-full">
+                <Card
+                  surface="pure"
+                  interactive
+                  radius="lg"
+                  padding="default"
+                  className="flex h-full flex-col justify-between border-[#DFDFD9]"
+                >
+                  <div className="space-y-3">
+                    <InlineMetadata
+                      tone="light"
+                      items={[item.index, item.tagline]}
+                    />
+                    <h3 className="font-display text-xl font-bold text-[#1A2130]">
+                      {item.principle}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-[#4A5365]">
+                      {item.description}
+                    </p>
+                  </div>
+                </Card>
+              </StaggerItem>
+            ))}
+
+            {/* 6th Card in the 3x2 grid: Full-Spectrum Discipline Summary */}
+            <StaggerItem className="h-full">
               <Card
-                key={item.index}
-                surface="pure"
+                surface="light"
+                interactive
                 radius="lg"
                 padding="default"
-                className="flex flex-col justify-between border-[#DFDFD9]"
+                className="flex h-full flex-col justify-between border-[#FA8112]/40"
               >
                 <div className="space-y-3">
                   <InlineMetadata
                     tone="light"
-                    items={[item.index, item.tagline]}
+                    items={['06', 'Unified Execution']}
                   />
                   <h3 className="font-display text-xl font-bold text-[#1A2130]">
-                    {item.principle}
+                    One Accountable Partner
                   </h3>
                   <p className="text-sm leading-relaxed text-[#4A5365]">
-                    {item.description}
+                    All 7 core capabilities—Web, Mobile, Custom Software/ERP, IT
+                    Consulting, Cloud, UI/UX, and AI Automation—delivered with
+                    unified architectural ownership.
                   </p>
                 </div>
+                <div className="mt-4 pt-3 border-t border-[#DFDFD9]">
+                  <Link
+                    to="/services"
+                    className="group inline-flex items-center gap-1.5 text-xs font-semibold text-[#FA8112] hover:text-[#1A2130]"
+                  >
+                    <span>View All 7 Services</span>
+                    <ArrowRight
+                      className="h-3.5 w-3.5 transition-transform duration-[180ms] group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </div>
               </Card>
-            ))}
-
-            {/* 6th Card in the 3x2 grid: Full-Spectrum Discipline Summary */}
-            <Card
-              surface="light"
-              radius="lg"
-              padding="default"
-              className="flex flex-col justify-between border-[#FA8112]/40"
-            >
-              <div className="space-y-3">
-                <InlineMetadata
-                  tone="light"
-                  items={['06', 'Unified Execution']}
-                />
-                <h3 className="font-display text-xl font-bold text-[#1A2130]">
-                  One Accountable Partner
-                </h3>
-                <p className="text-sm leading-relaxed text-[#4A5365]">
-                  All 7 core capabilities—Web, Mobile, Custom Software/ERP, IT
-                  Consulting, Cloud, UI/UX, and AI Automation—delivered with
-                  unified architectural ownership.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[#DFDFD9]">
-                <Link
-                  to="/services"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FA8112] hover:text-[#1A2130]"
-                >
-                  <span>View All 7 Services</span>
-                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </Link>
-              </div>
-            </Card>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </ArchitecturalSection>
 
@@ -265,7 +280,7 @@ export function AboutPage() {
           SECTION 4.4: COMPANY PROFILE & STRUCTURED PLACEHOLDERS (Light #F2F2EE)
       ====================================================================== */}
       <ArchitecturalSection tone="light" withBottomRule>
-        <div className="space-y-10">
+        <ScrollReveal className="space-y-10">
           <div className="max-w-3xl space-y-3">
             <SectionKicker
               index="04"
@@ -338,7 +353,7 @@ export function AboutPage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
 
       {/* =====================================================================
@@ -350,7 +365,7 @@ export function AboutPage() {
         withBottomRule={false}
         className="py-16 md:py-24"
       >
-        <div className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
+        <ScrollReveal className="flex flex-col items-start justify-between gap-8 rounded-lg border border-[#F2F2EE]/15 bg-[#111622] p-8 sm:p-10 lg:flex-row lg:items-center">
           <div className="max-w-2xl space-y-3">
             <SectionKicker
               index="05"
@@ -378,7 +393,7 @@ export function AboutPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Button>
-        </div>
+        </ScrollReveal>
       </ArchitecturalSection>
     </div>
   );

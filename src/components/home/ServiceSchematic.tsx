@@ -1,22 +1,29 @@
+import { motion, useReducedMotion } from 'motion/react';
 import type { DetailedServiceItem } from '../../config/homepage';
+import { BYTE_EASE } from '../../lib/motion';
 
 /**
  * Custom Architectural SVG Micro-Schematics for each of the 7 Byte Technology services.
- * Uses the official logo palette (#1A2130 Navy, #FA8112 Orange, #FDA63A Amber, #DFDFD9 Grid)
- * and modular geometry instead of generic clip-art or stock photos.
+ * Includes purposeful Motion for React path-draw and node-highlight transitions
+ * on viewport entry and card hover, while respecting prefers-reduced-motion.
  */
 export function ServiceSchematic({
   type,
 }: {
   type: DetailedServiceItem['schematicType'];
 }) {
+  const prefersReducedMotion = Boolean(useReducedMotion());
+
+  const frameClass =
+    'w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/75 p-2 transition-all duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:border-[#FA8112]/45 group-hover/card:bg-[#FFFFFF] group-hover/card:scale-[1.01]';
+
   switch (type) {
     case 'web':
       return (
         <svg
           aria-hidden="true"
           viewBox="0 0 280 96"
-          className="h-24 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-24 ${frameClass}`}
           fill="none"
         >
           {/* Browser Frame Header */}
@@ -37,7 +44,15 @@ export function ServiceSchematic({
           <rect x="177" y="37" width="48" height="4" fill="#F2F2EE" />
           <rect x="177" y="44" width="30" height="4" fill="#FDA63A" />
           <rect x="169" y="57" width="95" height="23" rx="2" fill="#FFFFFF" stroke="#FA8112" strokeOpacity="0.5" />
-          <path d="M177 73L195 65L215 69L238 61L254 63" stroke="#FA8112" strokeWidth="1.5" />
+          <motion.path
+            d="M177 73L195 65L215 69L238 61L254 63"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0, opacity: 0.4 }}
+            whileInView={{ pathLength: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: BYTE_EASE }}
+          />
         </svg>
       );
 
@@ -46,7 +61,7 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 280 96"
-          className="h-24 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-24 ${frameClass}`}
           fill="none"
         >
           {/* Left Mobile Device Frame */}
@@ -59,7 +74,19 @@ export function ServiceSchematic({
           <rect x="73" y="49" width="33" height="20" rx="2" fill="#FA8112" fillOpacity="0.15" stroke="#FA8112" />
           <rect x="36" y="74" width="70" height="8" rx="2" fill="#FA8112" />
           {/* Sync Connection Bridge */}
-          <line x1="114" y1="48" x2="166" y2="48" stroke="#FA8112" strokeWidth="1.5" strokeDasharray="3 3" />
+          <motion.line
+            x1="114"
+            y1="48"
+            x2="166"
+            y2="48"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            strokeDasharray="3 3"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: BYTE_EASE }}
+          />
           <rect x="132" y="40" width="16" height="16" rx="3" fill="#1A2130" />
           <path d="M137 48H143M140 45V51" stroke="#FDA63A" strokeWidth="1.5" />
           {/* Right Field/Sync State Module */}
@@ -77,7 +104,7 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 560 110"
-          className="h-28 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-28 ${frameClass}`}
           fill="none"
         >
           {/* Department Nodes (Left) */}
@@ -94,9 +121,35 @@ export function ServiceSchematic({
           <text x="36" y="89" fill="#1A2130" fontSize="10" fontFamily="monospace" fontWeight="600">HR &amp; PROCUREMENT</text>
 
           {/* Connector Lines to Central ERP Core */}
-          <path d="M140 24H180L200 55" stroke="#1A2130" strokeOpacity="0.3" strokeWidth="1.2" />
-          <path d="M140 55H200" stroke="#FA8112" strokeWidth="1.5" />
-          <path d="M140 86H180L200 55" stroke="#1A2130" strokeOpacity="0.3" strokeWidth="1.2" />
+          <motion.path
+            d="M140 24H180L200 55"
+            stroke="#1A2130"
+            strokeOpacity="0.3"
+            strokeWidth="1.2"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: BYTE_EASE }}
+          />
+          <motion.path
+            d="M140 55H200"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.08, ease: BYTE_EASE }}
+          />
+          <motion.path
+            d="M140 86H180L200 55"
+            stroke="#1A2130"
+            strokeOpacity="0.3"
+            strokeWidth="1.2"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.14, ease: BYTE_EASE }}
+          />
 
           {/* Central Byte ERP Core Kernel */}
           <rect x="200" y="18" width="160" height="74" rx="5" fill="#1A2130" />
@@ -109,7 +162,15 @@ export function ServiceSchematic({
           <text x="242" y="75" fill="#FDA63A" fontSize="9" fontFamily="monospace">Role-Based Governance</text>
 
           {/* Connector Lines to Executive Output */}
-          <path d="M360 55H410" stroke="#FA8112" strokeWidth="1.5" />
+          <motion.path
+            d="M360 55H410"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.22, ease: BYTE_EASE }}
+          />
 
           {/* Right Executive Analytics & Control Module */}
           <rect x="410" y="16" width="134" height="78" rx="4" fill="#FFFFFF" stroke="#FA8112" strokeOpacity="0.6" />
@@ -129,11 +190,23 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 280 96"
-          className="h-24 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-24 ${frameClass}`}
           fill="none"
         >
           {/* Architectural Roadmap Steps */}
-          <line x1="24" y1="48" x2="256" y2="48" stroke="#1A2130" strokeOpacity="0.2" strokeWidth="1.5" />
+          <motion.line
+            x1="24"
+            y1="48"
+            x2="256"
+            y2="48"
+            stroke="#1A2130"
+            strokeOpacity="0.2"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, ease: BYTE_EASE }}
+          />
           <rect x="20" y="24" width="68" height="48" rx="3" fill="#FFFFFF" stroke="#DFDFD9" />
           <text x="28" y="41" fill="#FA8112" fontSize="9" fontFamily="monospace" fontWeight="600">01. AUDIT</text>
           <rect x="28" y="49" width="48" height="4" fill="#1A2130" fillOpacity="0.7" />
@@ -156,7 +229,7 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 280 96"
-          className="h-24 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-24 ${frameClass}`}
           fill="none"
         >
           {/* Multi-Node Cloud Topology */}
@@ -165,8 +238,31 @@ export function ServiceSchematic({
           <text x="36" y="45" fill="#F2F2EE" fontSize="9" fontFamily="monospace" fontWeight="600">CLOUD VPC</text>
           <rect x="36" y="52" width="44" height="5" rx="1" fill="#FA8112" />
 
-          <line x1="92" y1="38" x2="124" y2="38" stroke="#FA8112" strokeWidth="1.5" />
-          <line x1="92" y1="58" x2="124" y2="58" stroke="#1A2130" strokeOpacity="0.3" strokeWidth="1.5" />
+          <motion.line
+            x1="92"
+            y1="38"
+            x2="124"
+            y2="38"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: BYTE_EASE }}
+          />
+          <motion.line
+            x1="92"
+            y1="58"
+            x2="124"
+            y2="58"
+            stroke="#1A2130"
+            strokeOpacity="0.3"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.1, ease: BYTE_EASE }}
+          />
 
           <rect x="124" y="26" width="60" height="18" rx="2" fill="#FAF9F6" stroke="#FA8112" />
           <text x="132" y="38" fill="#1A2130" fontSize="8.5" fontFamily="monospace">AUTO-SCALE</text>
@@ -174,7 +270,19 @@ export function ServiceSchematic({
           <rect x="124" y="52" width="60" height="18" rx="2" fill="#FAF9F6" stroke="#DFDFD9" />
           <text x="132" y="64" fill="#1A2130" fontSize="8.5" fontFamily="monospace">DB REPLICA</text>
 
-          <line x1="184" y1="48" x2="204" y2="48" stroke="#1A2130" strokeOpacity="0.35" strokeWidth="1.5" />
+          <motion.line
+            x1="184"
+            y1="48"
+            x2="204"
+            y2="48"
+            stroke="#1A2130"
+            strokeOpacity="0.35"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2, ease: BYTE_EASE }}
+          />
           <rect x="204" y="28" width="48" height="40" rx="3" fill="#FA8112" fillOpacity="0.12" stroke="#FA8112" />
           <text x="211" y="46" fill="#1A2130" fontSize="8.5" fontFamily="monospace" fontWeight="600">BACKUP</text>
           <text x="211" y="58" fill="#FA8112" fontSize="8.5" fontFamily="monospace" fontWeight="600">SECURE</text>
@@ -186,7 +294,7 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 280 96"
-          className="h-24 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-24 ${frameClass}`}
           fill="none"
         >
           {/* Design Token & Component Anatomy */}
@@ -212,7 +320,7 @@ export function ServiceSchematic({
         <svg
           aria-hidden="true"
           viewBox="0 0 560 110"
-          className="h-28 w-full rounded-md border border-[#DFDFD9] bg-[#F2F2EE]/70 p-2"
+          className={`h-28 ${frameClass}`}
           fill="none"
         >
           {/* Step 1: Unstructured Business Inputs */}
@@ -223,7 +331,19 @@ export function ServiceSchematic({
           <rect x="28" y="68" width="108" height="6" rx="1" fill="#1A2130" fillOpacity="0.2" />
 
           {/* Flow Arrow 1 */}
-          <line x1="152" y1="55" x2="196" y2="55" stroke="#FA8112" strokeWidth="1.5" strokeDasharray="4 3" />
+          <motion.line
+            x1="152"
+            y1="55"
+            x2="196"
+            y2="55"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            strokeDasharray="4 3"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: BYTE_EASE }}
+          />
           <path d="M192 51L198 55L192 59" stroke="#FA8112" strokeWidth="1.5" />
 
           {/* Step 2: AI & Rules Automation Engine */}
@@ -235,7 +355,18 @@ export function ServiceSchematic({
           <text x="222" y="75" fill="#111622" fontSize="8.5" fontFamily="monospace" fontWeight="700">Zero Manual Friction</text>
 
           {/* Flow Arrow 2 */}
-          <line x1="364" y1="55" x2="408" y2="55" stroke="#FA8112" strokeWidth="1.5" />
+          <motion.line
+            x1="364"
+            y1="55"
+            x2="408"
+            y2="55"
+            stroke="#FA8112"
+            strokeWidth="1.5"
+            initial={prefersReducedMotion ? false : { pathLength: 0 }}
+            whileInView={{ pathLength: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.16, ease: BYTE_EASE }}
+          />
           <path d="M404 51L410 55L404 59" stroke="#FA8112" strokeWidth="1.5" />
 
           {/* Step 3: Automated Action & Sync */}

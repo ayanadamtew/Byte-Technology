@@ -1,19 +1,27 @@
 import * as React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { resolveRouteMetadata } from '../../config/navigation';
+import { createPageTransitionVariants } from '../../lib/motion';
 import { BYTE_BRAND } from '../../styles/tokens';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
 /**
  * Shared SiteLayout wrapping all routes with:
+ * - Global MotionConfig respecting OS/browser prefers-reduced-motion
  * - Accessible skip-to-content link
  * - Dynamic document title and meta description synchronization
  * - Smooth scroll-to-top or hash-anchor alignment on route changes
- * - Global Header, Main landmark, and Global Footer
+ * - Subtle, zero-blocking page transitions between routes
  */
 export function SiteLayout() {
   const location = useLocation();
+  const prefersReducedMotion = Boolean(useReducedMotion());
+  const pageVariants = React.useMemo(
+    () => createPageTransitionVariants(prefersReducedMotion),
+    [prefersReducedMotion]
+  );
 
   React.useEffect(() => {
     const routeMeta = resolveRouteMetadata(location.pathname);
@@ -39,21 +47,30 @@ export function SiteLayout() {
   }, [location.pathname, location.hash]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F2F2EE] text-[#1A2130]">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-md focus:bg-[#1A2130] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#F2F2EE] focus:ring-2 focus:ring-[#FA8112]"
-      >
-        Skip to main content
-      </a>
+    <MotionConfig reducedMotion="user">
+      <div className="flex min-h-screen flex-col bg-[#F2F2EE] text-[#1A2130]">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-md focus:bg-[#1A2130] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#F2F2EE] focus:ring-2 focus:ring-[#FA8112]"
+        >
+          Skip to main content
+        </a>
 
-      <Header />
+        <Header />
 
-      <main id="main-content" className="flex-1 focus:outline-none" tabIndex={-1}>
-        <Outlet />
-      </main>
+        <main id="main-content" className="flex-1 focus:outline-none" tabIndex={-1}>
+          <motion.div
+            key={location.pathname}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <Outlet />
+          </motion.div>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </MotionConfig>
   );
 }
