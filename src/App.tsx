@@ -11,14 +11,20 @@ import {
   RouteArchitectureShell,
   NotFoundView,
 } from './components/layout/RouteArchitectureShell';
+import { HomePage } from './pages/HomePage';
 
 export default function App() {
+  const secondaryRoutes = BYTE_NAVIGATION_ITEMS.filter(
+    (route) => route.path !== '/'
+  );
+
   return (
     <ErrorBoundary>
       <BrowserRouter>
         <Routes>
           <Route element={<SiteLayout />}>
-            {BYTE_NAVIGATION_ITEMS.map((route) => (
+            <Route path="/" element={<HomePage />} />
+            {secondaryRoutes.map((route) => (
               <Route
                 key={route.path}
                 path={route.path}
