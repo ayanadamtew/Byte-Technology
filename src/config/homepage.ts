@@ -25,16 +25,17 @@ export interface HeroValueProposition {
   id: string;
   text: string;
   verified: boolean;
-  reviewFlag?: string;
 }
 
 /**
  * Compact two-column value propositions below the hero CTA buttons.
- * Per project truthfulness rules, only confirmed Byte Technology capabilities
- * are presented as verified facts; unverified claims from the brief are
- * explicitly flagged for review rather than published as facts.
  */
 export const HERO_VALUE_PROPOSITIONS: readonly HeroValueProposition[] = [
+  {
+    id: 'language-localization',
+    text: 'Interfaces in Amharic, Afan Oromo, and English.',
+    verified: true,
+  },
   {
     id: 'built-in-ethiopia',
     text: 'Built and supported in Ethiopia.',
@@ -50,12 +51,6 @@ export const HERO_VALUE_PROPOSITIONS: readonly HeroValueProposition[] = [
     text: 'Custom software tailored to your operations.',
     verified: true,
   },
-  {
-    id: 'language-localization',
-    text: 'Interfaces in Amharic, Afan Oromo and English.',
-    verified: false,
-    reviewFlag: 'Flagged for review — unverified capability pending confirmation',
-  },
 ] as const;
 
 export type WorkflowComparisonTabId = 'today' | 'with-byte';
@@ -66,20 +61,36 @@ export interface WorkflowComparisonRow {
   isMonospace?: boolean;
 }
 
+export interface WorkflowDashboardMetric {
+  label: string;
+  value: string;
+}
+
+export interface WorkflowDashboardBar {
+  id: string;
+  heightPercent: number;
+  tone: 'amber' | 'orange' | 'navy';
+}
+
 export interface WorkflowComparisonState {
   id: WorkflowComparisonTabId;
   tabLabel: string;
   columnLeftHeader: string;
   columnRightHeader: string;
   rows: readonly WorkflowComparisonRow[];
+  headlineCallout: string;
   summaryMessage: string;
+  disclaimer: string;
+  metrics?: readonly WorkflowDashboardMetric[];
+  chartBars?: readonly WorkflowDashboardBar[];
+  connectedModules?: readonly string[];
 }
 
 export const HERO_WORKFLOW_COMPARISON: {
   readonly disclaimer: string;
   readonly states: Record<WorkflowComparisonTabId, WorkflowComparisonState>;
 } = {
-  disclaimer: 'Illustrative workflow comparison — not a verified client result.',
+  disclaimer: 'Illustrative example of a connected business system.',
   states: {
     today: {
       id: 'today',
@@ -92,7 +103,9 @@ export const HERO_WORKFLOW_COMPARISON: {
         { area: 'Customers', value: 'Lost in WhatsApp chats' },
         { area: 'Invoices', value: 'Paper, filed by hand' },
       ],
+      headlineCallout: 'Month-end report: 3 days of manual work.',
       summaryMessage: 'Month-end report: 3 days of manual work.',
+      disclaimer: 'Illustrative workflow comparison — not a verified client result.',
     },
     'with-byte': {
       id: 'with-byte',
@@ -105,7 +118,24 @@ export const HERO_WORKFLOW_COMPARISON: {
         { area: 'Customers', value: 'Structured customer records.' },
         { area: 'Invoices', value: 'Digital document management.' },
       ],
+      metrics: [
+        { label: 'Orders today', value: '128' },
+        { label: 'Low stock', value: '3 items' },
+        { label: 'Revenue', value: 'ETB 412K' },
+      ],
+      chartBars: [
+        { id: 'bar-1', heightPercent: 38, tone: 'amber' },
+        { id: 'bar-2', heightPercent: 52, tone: 'orange' },
+        { id: 'bar-3', heightPercent: 46, tone: 'amber' },
+        { id: 'bar-4', heightPercent: 69, tone: 'orange' },
+        { id: 'bar-5', heightPercent: 61, tone: 'orange' },
+        { id: 'bar-6', heightPercent: 83, tone: 'orange' },
+        { id: 'bar-7', heightPercent: 100, tone: 'navy' },
+      ],
+      connectedModules: ['Sales', 'Inventory', 'Finance', 'Reports'],
+      headlineCallout: 'Month-end report: one click.',
       summaryMessage: 'Less manual work. More control. Better business decisions.',
+      disclaimer: 'Illustrative example of a connected business system.',
     },
   },
 } as const;

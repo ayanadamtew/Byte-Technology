@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  AlertCircle,
   ArrowRight,
   ArrowUpRight,
   Check,
-  CheckCircle2,
   Copy,
   Mail,
   MapPin,
@@ -152,34 +150,15 @@ export function HomePage() {
                 {HERO_VALUE_PROPOSITIONS.map((item) => (
                   <li
                     key={item.id}
-                    className={cn(
-                      'flex items-start gap-2.5 text-sm leading-snug',
-                      item.verified
-                        ? 'text-[#1A2130]'
-                        : 'rounded-md border border-dashed border-[#9A3412]/40 bg-[#FAF9F6] px-2.5 py-1.5 text-[#4A5365]'
-                    )}
+                    className="flex items-start gap-2.5 text-sm leading-snug text-[#1A2130]"
                   >
-                    {item.verified ? (
-                      <span
-                        aria-hidden="true"
-                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FA8112]"
-                      />
-                    ) : (
-                      <AlertCircle
-                        aria-hidden="true"
-                        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#9A3412]"
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <span className={cn(item.verified ? 'font-medium text-[#1A2130]' : 'line-through decoration-[#9A3412]/50 text-xs text-[#525B6C]')}>
-                        {item.text}
-                      </span>
-                      {!item.verified && item.reviewFlag && (
-                        <span className="mt-0.5 block font-mono text-[10px] font-semibold text-[#9A3412]">
-                          [{item.reviewFlag}]
-                        </span>
-                      )}
-                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FA8112]"
+                    />
+                    <span className="font-medium text-[#1A2130]">
+                      {item.text}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -188,44 +167,38 @@ export function HomePage() {
 
           {/* Right Side (5 Columns): Interactive Business Workflow Comparison Card */}
           <div className="lg:col-span-5">
-            <div className="relative overflow-hidden rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] shadow-[0_14px_36px_-10px_rgba(26,33,48,0.1)]">
+            <div className="relative overflow-hidden rounded-xl border border-[#DFDFD9] bg-[#FFFFFF] p-4 sm:p-6 shadow-[0_14px_36px_-10px_rgba(26,33,48,0.1)]">
               <GridCrosshair className="absolute top-3.5 right-3.5 pointer-events-none" tone="light" />
 
-              {/* Top Header & Interactive Selectable Tabs: Today | With Byte */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DFDFD9] bg-[#FAF9F6] px-4 py-3.5 sm:px-6">
-                <div
-                  role="tablist"
-                  aria-label="Workflow comparison view"
-                  className="inline-flex items-center rounded-md border border-[#DFDFD9] bg-[#F2F2EE] p-1"
-                >
-                  {(['today', 'with-byte'] as const).map((tabKey) => {
-                    const tabState = HERO_WORKFLOW_COMPARISON.states[tabKey];
-                    const isSelected = comparisonTab === tabKey;
-                    return (
-                      <button
-                        key={tabKey}
-                        id={`hero-comparison-tab-${tabKey}`}
-                        type="button"
-                        role="tab"
-                        aria-selected={isSelected}
-                        aria-controls={`hero-comparison-panel-${tabKey}`}
-                        onClick={() => setComparisonTab(tabKey)}
-                        className={cn(
-                          'relative rounded-[4px] px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
-                          isSelected
-                            ? 'bg-[#1A2130] text-[#F2F2EE] shadow-xs'
-                            : 'text-[#4A5365] hover:text-[#1A2130]'
-                        )}
-                      >
-                        {tabState.tabLabel}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <span className="font-mono text-[11px] font-medium text-[#525B6C] pr-4">
-                  Illustrative scenario
-                </span>
+              {/* Full-Width Segmented Tab Switcher: Today | With Byte */}
+              <div
+                role="tablist"
+                aria-label="Workflow comparison view"
+                className="grid grid-cols-2 gap-1.5 rounded-lg border border-[#DFDFD9] bg-[#F2F2EE] p-1"
+              >
+                {(['today', 'with-byte'] as const).map((tabKey) => {
+                  const tabState = HERO_WORKFLOW_COMPARISON.states[tabKey];
+                  const isSelected = comparisonTab === tabKey;
+                  return (
+                    <button
+                      key={tabKey}
+                      id={`hero-comparison-tab-${tabKey}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={isSelected}
+                      aria-controls={`hero-comparison-panel-${tabKey}`}
+                      onClick={() => setComparisonTab(tabKey)}
+                      className={cn(
+                        'relative rounded-md py-2.5 text-center text-xs sm:text-sm font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
+                        isSelected
+                          ? 'bg-[#FFFFFF] text-[#1A2130] ring-2 ring-[#FA8112] shadow-xs'
+                          : 'text-[#4A5365] hover:text-[#1A2130]'
+                      )}
+                    >
+                      {tabState.tabLabel}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Tab Panel Body */}
@@ -239,67 +212,133 @@ export function HomePage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-4 sm:p-6"
+                  className="mt-5"
                 >
-                  {/* Column Headers */}
-                  <div className="grid grid-cols-12 items-center gap-3 border-b border-[#DFDFD9] pb-2.5 text-[11px] font-semibold tracking-[0.04em] uppercase text-[#525B6C]">
-                    <div className="col-span-4 sm:col-span-5">
-                      {activeComparison.columnLeftHeader}
-                    </div>
-                    <div className="col-span-8 sm:col-span-7 text-right">
-                      {activeComparison.columnRightHeader}
-                    </div>
-                  </div>
-
-                  {/* Four Comparison Rows */}
-                  <div className="divide-y divide-[#DFDFD9]/80">
-                    {activeComparison.rows.map((row) => (
-                      <div
-                        key={row.area}
-                        className="grid grid-cols-12 items-center gap-3 py-3.5 text-sm transition-colors hover:bg-[#FAF9F6]/70"
-                      >
-                        <div className="col-span-4 sm:col-span-5 font-medium text-[#1A2130]">
-                          {row.area}
+                  {comparisonTab === 'today' ? (
+                    <>
+                      {/* Today View: Manual Problem Comparison Rows */}
+                      <div className="grid grid-cols-12 items-center gap-3 border-b border-[#DFDFD9] pb-2.5 text-[11px] font-semibold tracking-[0.04em] uppercase text-[#525B6C]">
+                        <div className="col-span-4 sm:col-span-5">
+                          {activeComparison.columnLeftHeader}
                         </div>
-                        <div className="col-span-8 sm:col-span-7 flex items-center justify-end text-right">
-                          {row.isMonospace ? (
-                            <code className="rounded border border-[#DFDFD9] bg-[#F2F2EE] px-2 py-0.5 font-mono text-xs font-medium text-[#1A2130] break-all">
-                              {row.value}
-                            </code>
-                          ) : comparisonTab === 'with-byte' ? (
-                            <span className="inline-flex items-center justify-end gap-1.5 font-medium text-[#1A2130]">
-                              <CheckCircle2
-                                className="h-3.5 w-3.5 shrink-0 text-[#FA8112]"
-                                aria-hidden="true"
-                              />
-                              <span>{row.value}</span>
-                            </span>
-                          ) : (
-                            <span className="text-[#4A5365]">{row.value}</span>
-                          )}
+                        <div className="col-span-8 sm:col-span-7 text-right">
+                          {activeComparison.columnRightHeader}
                         </div>
                       </div>
-                    ))}
-                  </div>
 
-                  {/* Summary Callout Box Below Rows */}
-                  <div
-                    className={cn(
-                      'mt-4 rounded-md border px-4 py-3 transition-colors',
-                      comparisonTab === 'today'
-                        ? 'border-[#FA8112]/35 bg-[#FAF9F6] text-[#9A3412]'
-                        : 'border-[#1A2130] bg-[#1A2130] text-[#F2F2EE]'
-                    )}
-                  >
-                    <p className="text-xs font-semibold sm:text-sm">
-                      {activeComparison.summaryMessage}
-                    </p>
-                  </div>
+                      <div className="divide-y divide-[#DFDFD9]/80">
+                        {activeComparison.rows.map((row) => (
+                          <div
+                            key={row.area}
+                            className="grid grid-cols-12 items-center gap-3 py-3.5 text-sm transition-colors hover:bg-[#FAF9F6]/70"
+                          >
+                            <div className="col-span-4 sm:col-span-5 font-medium text-[#1A2130]">
+                              {row.area}
+                            </div>
+                            <div className="col-span-8 sm:col-span-7 flex items-center justify-end text-right">
+                              {row.isMonospace ? (
+                                <code className="rounded border border-[#DFDFD9] bg-[#F2F2EE] px-2 py-0.5 font-mono text-xs font-medium text-[#1A2130] break-all">
+                                  {row.value}
+                                </code>
+                              ) : (
+                                <span className="text-[#4A5365]">{row.value}</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-                  {/* Explicit Illustrative Disclaimer */}
-                  <p className="mt-2.5 text-[11px] text-[#525B6C]">
-                    {HERO_WORKFLOW_COMPARISON.disclaimer}
-                  </p>
+                      <div className="mt-4 rounded-md border border-[#FA8112]/35 bg-[#FAF9F6] px-4 py-3 text-[#9A3412]">
+                        <p className="text-xs font-semibold sm:text-sm">
+                          {activeComparison.summaryMessage}
+                        </p>
+                      </div>
+
+                      <p className="mt-3 text-[11px] text-[#525B6C]">
+                        {activeComparison.disclaimer}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      {/* With Byte View: Graphical Connected Business Dashboard */}
+                      {/* 1. Three KPI Metric Cards */}
+                      {activeComparison.metrics && (
+                        <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                          {activeComparison.metrics.map((metric) => (
+                            <div
+                              key={metric.label}
+                              className="rounded-lg border border-[#DFDFD9] bg-[#FAF9F6] p-3 sm:p-3.5"
+                            >
+                              <span className="block text-[11px] sm:text-xs font-medium text-[#525B6C]">
+                                {metric.label}
+                              </span>
+                              <span className="mt-1 block font-display text-base sm:text-xl font-bold tracking-[-0.02em] text-[#1A2130]">
+                                {metric.value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 2. Graphical 7-Bar Chart with Horizontal Baseline */}
+                      {activeComparison.chartBars && (
+                        <div className="mt-6">
+                          <div
+                            aria-label="Illustrative business growth and operational visibility chart"
+                            className="flex h-28 sm:h-32 items-end justify-between gap-2 sm:gap-3 border-b-2 border-[#1A2130] px-1"
+                          >
+                            {activeComparison.chartBars.map((bar, index) => (
+                              <motion.div
+                                key={bar.id}
+                                initial={{ height: 0 }}
+                                animate={{ height: `${bar.heightPercent}%` }}
+                                transition={{
+                                  duration: 0.35,
+                                  delay: index * 0.03,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }}
+                                className={cn(
+                                  'flex-1 rounded-t-[2px]',
+                                  bar.tone === 'amber' && 'bg-[#FDA63A]',
+                                  bar.tone === 'orange' && 'bg-[#FA8112]',
+                                  bar.tone === 'navy' && 'bg-[#1A2130]'
+                                )}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 3. Connected Module Badges (Sales, Inventory, Finance, Reports) */}
+                      {activeComparison.connectedModules && (
+                        <div className="mt-4 flex flex-wrap items-center gap-2">
+                          {activeComparison.connectedModules.map((moduleName) => (
+                            <span
+                              key={moduleName}
+                              className="inline-flex items-center rounded-md border border-[#FA8112]/35 bg-[#FAF9F6] px-3 py-1 text-xs font-medium text-[#9A3412]"
+                            >
+                              {moduleName}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 4. Bold One-Click Headline Takeaway & Supporting Summary */}
+                      <div className="mt-5">
+                        <p className="font-display text-lg sm:text-xl font-bold tracking-[-0.02em] text-[#1A2130]">
+                          {activeComparison.headlineCallout}
+                        </p>
+                        <p className="mt-1 text-xs sm:text-sm text-[#4A5365]">
+                          {activeComparison.summaryMessage}
+                        </p>
+                      </div>
+
+                      {/* 5. Illustrative Caption */}
+                      <p className="mt-4 text-[11px] text-[#525B6C]">
+                        {activeComparison.disclaimer}
+                      </p>
+                    </>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>

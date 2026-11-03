@@ -31,21 +31,16 @@ test('Homepage hero preserves the exact requested headline, supporting text, CTA
   );
 });
 
-test('Hero value propositions flag unverified claims for review instead of publishing them as confirmed facts', () => {
+test('Hero value propositions include all 4 items including Interfaces in Amharic, Afan Oromo, and English', () => {
   assert.equal(HERO_VALUE_PROPOSITIONS.length, 4);
-  const confirmed = HERO_VALUE_PROPOSITIONS.filter((item) => item.verified);
-  const flagged = HERO_VALUE_PROPOSITIONS.filter((item) => !item.verified);
-
-  assert.equal(confirmed.length, 3);
-  assert.equal(flagged.length, 1);
+  assert.ok(HERO_VALUE_PROPOSITIONS.every((item) => item.verified));
   assert.equal(
-    flagged[0].text,
-    'Interfaces in Amharic, Afan Oromo and English.'
+    HERO_VALUE_PROPOSITIONS[0].text,
+    'Interfaces in Amharic, Afan Oromo, and English.'
   );
-  assert.ok(flagged[0].reviewFlag && flagged[0].reviewFlag.length > 0);
 });
 
-test('Hero workflow comparison defines Today and With Byte tabs with 4 rows each and illustrative disclaimer', () => {
+test('Hero workflow comparison defines Today and With Byte tabs with graphical dashboard metrics, bars, modules, and one-click takeaway', () => {
   assert.ok(HERO_WORKFLOW_COMPARISON.disclaimer.toLowerCase().includes('illustrative'));
 
   const today = HERO_WORKFLOW_COMPARISON.states.today;
@@ -64,19 +59,29 @@ test('Hero workflow comparison defines Today and With Byte tabs with 4 rows each
 
   const withByte = HERO_WORKFLOW_COMPARISON.states['with-byte'];
   assert.equal(withByte.tabLabel, 'With Byte');
-  assert.equal(withByte.rows.length, 4);
   assert.deepEqual(
-    withByte.rows.map((r) => [r.area, r.value]),
+    withByte.metrics?.map((m) => [m.label, m.value]),
     [
-      ['Orders', 'Organized digital workflow.'],
-      ['Stock', 'Centralized inventory management.'],
-      ['Customers', 'Structured customer records.'],
-      ['Invoices', 'Digital document management.'],
+      ['Orders today', '128'],
+      ['Low stock', '3 items'],
+      ['Revenue', 'ETB 412K'],
     ]
   );
+  assert.equal(withByte.chartBars?.length, 7);
+  assert.deepEqual(withByte.connectedModules, [
+    'Sales',
+    'Inventory',
+    'Finance',
+    'Reports',
+  ]);
+  assert.equal(withByte.headlineCallout, 'Month-end report: one click.');
   assert.equal(
     withByte.summaryMessage,
     'Less manual work. More control. Better business decisions.'
+  );
+  assert.equal(
+    withByte.disclaimer,
+    'Illustrative example of a connected business system.'
   );
 });
 
