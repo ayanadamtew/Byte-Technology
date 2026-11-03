@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import {
+  AlertCircle,
   ArrowRight,
   ArrowUpRight,
   Check,
+  CheckCircle2,
   Copy,
-  Layers,
   Mail,
   MapPin,
   ShieldCheck,
@@ -13,13 +14,14 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import {
   HOMEPAGE_HERO,
-  HERO_SYSTEM_LAYERS,
+  HERO_VALUE_PROPOSITIONS,
+  HERO_WORKFLOW_COMPARISON,
   TARGET_AUDIENCE_SEGMENTS,
   HOMEPAGE_SERVICES_BENTO,
   FEATURED_SOLUTION_BLUEPRINTS,
   WHY_BYTE_PILLARS,
   DEVELOPMENT_PROCESS_PHASES,
-  type SystemLayerNode,
+  type WorkflowComparisonTabId,
   type FeaturedSolutionBlueprint,
 } from '../config/homepage';
 import { buildConsultationMailto } from '../config/navigation';
@@ -44,7 +46,7 @@ import { ServiceSchematic } from '../components/home/ServiceSchematic';
 /**
  * BYTE TECHNOLOGY — COMPLETE HOMEPAGE
  * Implements:
- * 1. Premium Hero Section ("Build smarter. Work better. Move Ethiopia forward.") + Interactive 3-Layer System Blueprint
+ * 1. Premium Hero Section ("Software that replaces your manual workflows.") + Interactive Workflow Comparison Panel ("Today" vs "With Byte") + Bottom Mission Statement
  * 2. Clear Company Introduction & Target Customer Profiles (Businesses & Organizations in Ethiopia)
  * 3. Services Overview (Asymmetric 12-Column Bento Matrix across all 7 Official Services with custom SVG schematics)
  * 4. Featured Work / Reference Enterprise Solution Blueprints (Interactive 4-Blueprint Architecture Explorer — zero fabricated data)
@@ -53,7 +55,7 @@ import { ServiceSchematic } from '../components/home/ServiceSchematic';
  * 7. Strong Contact & Consultation CTA (Dark Section with interactive capability brief selector + direct email copy/mailto)
  */
 export function HomePage() {
-  const [activeLayerId, setActiveLayerId] = React.useState<SystemLayerNode['id']>('core');
+  const [comparisonTab, setComparisonTab] = React.useState<WorkflowComparisonTabId>('today');
   const [activeBlueprintId, setActiveBlueprintId] = React.useState<FeaturedSolutionBlueprint['id']>('erp-blueprint');
   const [selectedCtaService, setSelectedCtaService] = React.useState<string>('Custom software and ERP systems');
   const [emailCopied, setEmailCopied] = React.useState(false);
@@ -80,9 +82,7 @@ export function HomePage() {
     };
   }, [hydrationStage]);
 
-  const activeLayer =
-    HERO_SYSTEM_LAYERS.find((layer) => layer.id === activeLayerId) ??
-    HERO_SYSTEM_LAYERS[1];
+  const activeComparison = HERO_WORKFLOW_COMPARISON.states[comparisonTab];
 
   const activeBlueprint =
     FEATURED_SOLUTION_BLUEPRINTS.find((bp) => bp.id === activeBlueprintId) ??
@@ -107,11 +107,11 @@ export function HomePage() {
         tone="light"
         withGridBg
         withBottomRule
-        className="pt-12 pb-20 md:pt-20 md:pb-28"
+        className="pt-10 pb-14 md:pt-16 md:pb-20"
       >
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-center">
-          {/* Left 7 Columns: Strategic Headline, Official Mission & Dual CTAs */}
-          <div className="lg:col-span-7 space-y-7">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
+          {/* Left Side (7 Columns): Headline, Supporting Copy, CTAs & Value Propositions */}
+          <div className="lg:col-span-7 space-y-6">
             <SectionKicker
               index="01"
               label={HOMEPAGE_HERO.kicker}
@@ -120,23 +120,15 @@ export function HomePage() {
 
             <HeroHeadlineReveal
               text={HOMEPAGE_HERO.headline}
-              className="font-display text-[clamp(2.5rem,4.6vw,4rem)] font-bold leading-[1.06] tracking-[-0.03em] text-[#1A2130]"
+              className="font-display text-[clamp(2.35rem,4.5vw,3.85rem)] font-bold leading-[1.06] tracking-[-0.03em] text-[#1A2130]"
             />
 
-            <div className="rounded-md border border-[#DFDFD9] bg-[#FAF9F6] px-5 py-4">
-              <p className="font-display text-base font-semibold text-[#1A2130] sm:text-lg">
-                “{HOMEPAGE_HERO.mission}”
-              </p>
-              <p className="mt-1 text-xs text-[#525B6C]">
-                Official Mandate · Serving Businesses and Organizations Across {BYTE_BRAND.location}
-              </p>
-            </div>
-
-            <p className="max-w-2xl text-base leading-relaxed text-[#4A5365] sm:text-lg">
+            <p className="max-w-xl text-base leading-relaxed text-[#4A5365] sm:text-lg">
               {HOMEPAGE_HERO.lead}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-1">
+            {/* Primary & Secondary CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-3.5 pt-1">
               <Button asChild variant="primary" size="lg">
                 <Link to={HOMEPAGE_HERO.primaryCta.path}>
                   <span>{HOMEPAGE_HERO.primaryCta.label}</span>
@@ -151,158 +143,178 @@ export function HomePage() {
               </Button>
             </div>
 
-            <InlineMetadata
-              tone="light"
-              className="pt-2"
-              items={[
-                '7 Integrated Technology Disciplines',
-                `Based in ${BYTE_BRAND.location}`,
-                `Direct Inquiry: ${BYTE_BRAND.email}`,
-              ]}
-            />
+            {/* Compact Two-Column List of Four Value Propositions */}
+            <div className="pt-2">
+              <ul
+                aria-label="Byte Technology value propositions"
+                className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2"
+              >
+                {HERO_VALUE_PROPOSITIONS.map((item) => (
+                  <li
+                    key={item.id}
+                    className={cn(
+                      'flex items-start gap-2.5 text-sm leading-snug',
+                      item.verified
+                        ? 'text-[#1A2130]'
+                        : 'rounded-md border border-dashed border-[#9A3412]/40 bg-[#FAF9F6] px-2.5 py-1.5 text-[#4A5365]'
+                    )}
+                  >
+                    {item.verified ? (
+                      <span
+                        aria-hidden="true"
+                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FA8112]"
+                      />
+                    ) : (
+                      <AlertCircle
+                        aria-hidden="true"
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#9A3412]"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <span className={cn(item.verified ? 'font-medium text-[#1A2130]' : 'line-through decoration-[#9A3412]/50 text-xs text-[#525B6C]')}>
+                        {item.text}
+                      </span>
+                      {!item.verified && item.reviewFlag && (
+                        <span className="mt-0.5 block font-mono text-[10px] font-semibold text-[#9A3412]">
+                          [{item.reviewFlag}]
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
-          {/* Right 5 Columns: Interactive 3-Layer "Byte System Architecture" Schematic */}
+          {/* Right Side (5 Columns): Interactive Business Workflow Comparison Card */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-lg border border-[#DFDFD9] bg-[#FAF9F6] p-6 sm:p-7 shadow-[0_12px_32px_-8px_rgba(26,33,48,0.08)]">
-              <GridCrosshair className="absolute top-3.5 right-3.5" tone="light" />
+            <div className="relative overflow-hidden rounded-lg border border-[#DFDFD9] bg-[#FFFFFF] shadow-[0_14px_36px_-10px_rgba(26,33,48,0.1)]">
+              <GridCrosshair className="absolute top-3.5 right-3.5 pointer-events-none" tone="light" />
 
-              <div className="flex items-center justify-between border-b border-[#DFDFD9] pb-4">
-                <div>
-                  <span className="font-mono text-[11px] font-semibold text-[#9A3412]">
-                    INTERACTIVE SYSTEM ARCHITECTURE
-                  </span>
-                  <h2 className="mt-0.5 font-display text-lg font-bold text-[#1A2130]">
-                    Full-Stack Digitalization Blueprint
-                  </h2>
-                </div>
-                {/* Modular "B" Geometric Motif */}
-                <svg
-                  aria-hidden="true"
-                  width="28"
-                  height="28"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  className="shrink-0"
+              {/* Top Header & Interactive Selectable Tabs: Today | With Byte */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DFDFD9] bg-[#FAF9F6] px-4 py-3.5 sm:px-6">
+                <div
+                  role="tablist"
+                  aria-label="Workflow comparison view"
+                  className="inline-flex items-center rounded-md border border-[#DFDFD9] bg-[#F2F2EE] p-1"
                 >
-                  <rect x="3" y="4" width="7" height="24" fill="#1A2130" />
-                  <rect x="12" y="4" width="6" height="6" fill="#FA8112" />
-                  <rect x="12" y="13" width="6" height="6" fill="#FA8112" />
-                  <rect x="12" y="22" width="6" height="6" fill="#FA8112" />
-                  <path d="M20 4C24.9706 4 29 8.02944 29 13H20V4Z" fill="#FDA63A" />
-                  <path d="M20 28C24.9706 28 29 23.9706 29 19H20V28Z" fill="#FDA63A" />
-                </svg>
-              </div>
-
-              <p className="mt-3 text-xs leading-relaxed text-[#4A5365]">
-                Select an architectural layer below to inspect how Byte Technology
-                connects user interfaces, enterprise ERP operations, and cloud
-                infrastructure:
-              </p>
-
-              {/* Interactive Layer Selector Buttons */}
-              <div
-                role="tablist"
-                aria-label="Byte Technology System Architecture Layers"
-                className="mt-4 space-y-2.5"
-              >
-                {HERO_SYSTEM_LAYERS.map((layer) => {
-                  const isSelected = layer.id === activeLayer.id;
-                  return (
-                    <button
-                      key={layer.id}
-                      id={`hero-layer-tab-${layer.id}`}
-                      type="button"
-                      role="tab"
-                      aria-selected={isSelected}
-                      aria-controls={`hero-layer-panel-${layer.id}`}
-                      onClick={() => setActiveLayerId(layer.id)}
-                      className={cn(
-                        'w-full rounded-md border p-3.5 text-left transition-all duration-[180ms] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
-                        isSelected
-                          ? 'border-[#FA8112] bg-[#1A2130] text-[#F2F2EE]'
-                          : 'border-[#DFDFD9] bg-[#FFFFFF] text-[#1A2130] hover:border-[#1A2130]/50'
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <span
-                            className={cn(
-                              'font-mono text-xs font-semibold',
-                              isSelected ? 'text-[#FDA63A]' : 'text-[#9A3412]'
-                            )}
-                          >
-                            {layer.index}.
-                          </span>
-                          <span className="font-display text-sm font-semibold">
-                            {layer.layerName}
-                          </span>
-                        </div>
-                        <span
-                          className={cn(
-                            'font-mono text-[11px]',
-                            isSelected ? 'text-[#B0B8C8]' : 'text-[#525B6C]'
-                          )}
-                        >
-                          {layer.services.length} Capabilities
-                        </span>
-                      </div>
-                      <p
+                  {(['today', 'with-byte'] as const).map((tabKey) => {
+                    const tabState = HERO_WORKFLOW_COMPARISON.states[tabKey];
+                    const isSelected = comparisonTab === tabKey;
+                    return (
+                      <button
+                        key={tabKey}
+                        id={`hero-comparison-tab-${tabKey}`}
+                        type="button"
+                        role="tab"
+                        aria-selected={isSelected}
+                        aria-controls={`hero-comparison-panel-${tabKey}`}
+                        onClick={() => setComparisonTab(tabKey)}
                         className={cn(
-                          'mt-1 pl-6 text-xs',
-                          isSelected ? 'text-[#B0B8C8]' : 'text-[#4A5365]'
+                          'relative rounded-[4px] px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112]',
+                          isSelected
+                            ? 'bg-[#1A2130] text-[#F2F2EE] shadow-xs'
+                            : 'text-[#4A5365] hover:text-[#1A2130]'
                         )}
                       >
-                        {layer.subtitle}
-                      </p>
-                    </button>
-                  );
-                })}
+                        {tabState.tabLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <span className="font-mono text-[11px] font-medium text-[#525B6C] pr-4">
+                  Illustrative scenario
+                </span>
               </div>
 
-              {/* Active Layer Details Panel with Smooth Transition */}
+              {/* Tab Panel Body */}
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  key={activeLayer.id}
-                  id={`hero-layer-panel-${activeLayer.id}`}
-                  initial={{ opacity: 0, y: 6 }}
+                  key={activeComparison.id}
+                  id={`hero-comparison-panel-${activeComparison.id}`}
+                  role="tabpanel"
+                  aria-labelledby={`hero-comparison-tab-${activeComparison.id}`}
+                  initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  role="tabpanel"
-                  aria-labelledby={`hero-layer-tab-${activeLayer.id}`}
-                  className="mt-4 rounded-md border border-[#DFDFD9] bg-[#FFFFFF] p-4"
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="p-4 sm:p-6"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold text-[#1A2130]">
-                      Active Layer {activeLayer.index} · {activeLayer.layerName}
-                    </span>
-                    <Layers className="h-4 w-4 text-[#9A3412]" aria-hidden="true" />
+                  {/* Column Headers */}
+                  <div className="grid grid-cols-12 items-center gap-3 border-b border-[#DFDFD9] pb-2.5 text-[11px] font-semibold tracking-[0.04em] uppercase text-[#525B6C]">
+                    <div className="col-span-4 sm:col-span-5">
+                      {activeComparison.columnLeftHeader}
+                    </div>
+                    <div className="col-span-8 sm:col-span-7 text-right">
+                      {activeComparison.columnRightHeader}
+                    </div>
                   </div>
-                  <p className="mt-1.5 text-xs leading-relaxed text-[#4A5365]">
-                    {activeLayer.description}
-                  </p>
-                  <ul className="mt-3 space-y-2 border-t border-[#DFDFD9] pt-3">
-                    {activeLayer.services.map((svc) => (
-                      <li
-                        key={svc.name}
-                        className="flex items-baseline justify-between gap-2 text-xs"
+
+                  {/* Four Comparison Rows */}
+                  <div className="divide-y divide-[#DFDFD9]/80">
+                    {activeComparison.rows.map((row) => (
+                      <div
+                        key={row.area}
+                        className="grid grid-cols-12 items-center gap-3 py-3.5 text-sm transition-colors hover:bg-[#FAF9F6]/70"
                       >
-                        <span className="font-medium text-[#1A2130]">
-                          <span className="font-mono font-semibold text-[#9A3412] mr-1.5">
-                            {svc.index}.
-                          </span>
-                          {svc.name}
-                        </span>
-                        <span className="text-right text-[11px] text-[#525B6C]">
-                          {svc.role}
-                        </span>
-                      </li>
+                        <div className="col-span-4 sm:col-span-5 font-medium text-[#1A2130]">
+                          {row.area}
+                        </div>
+                        <div className="col-span-8 sm:col-span-7 flex items-center justify-end text-right">
+                          {row.isMonospace ? (
+                            <code className="rounded border border-[#DFDFD9] bg-[#F2F2EE] px-2 py-0.5 font-mono text-xs font-medium text-[#1A2130] break-all">
+                              {row.value}
+                            </code>
+                          ) : comparisonTab === 'with-byte' ? (
+                            <span className="inline-flex items-center justify-end gap-1.5 font-medium text-[#1A2130]">
+                              <CheckCircle2
+                                className="h-3.5 w-3.5 shrink-0 text-[#FA8112]"
+                                aria-hidden="true"
+                              />
+                              <span>{row.value}</span>
+                            </span>
+                          ) : (
+                            <span className="text-[#4A5365]">{row.value}</span>
+                          )}
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
+
+                  {/* Summary Callout Box Below Rows */}
+                  <div
+                    className={cn(
+                      'mt-4 rounded-md border px-4 py-3 transition-colors',
+                      comparisonTab === 'today'
+                        ? 'border-[#FA8112]/35 bg-[#FAF9F6] text-[#9A3412]'
+                        : 'border-[#1A2130] bg-[#1A2130] text-[#F2F2EE]'
+                    )}
+                  >
+                    <p className="text-xs font-semibold sm:text-sm">
+                      {activeComparison.summaryMessage}
+                    </p>
+                  </div>
+
+                  {/* Explicit Illustrative Disclaimer */}
+                  <p className="mt-2.5 text-[11px] text-[#525B6C]">
+                    {HERO_WORKFLOW_COMPARISON.disclaimer}
+                  </p>
                 </motion.div>
               </AnimatePresence>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Mission Statement below Subtle Horizontal Divider */}
+        <div className="mt-12 border-t border-[#DFDFD9] pt-6 md:mt-14 md:pt-7">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+            <p className="font-display text-base font-semibold tracking-[-0.01em] text-[#1A2130] sm:text-lg">
+              {HOMEPAGE_HERO.mission}
+            </p>
+            <span className="font-mono text-xs text-[#525B6C]">
+              Official Mandate · {BYTE_BRAND.name}, {BYTE_BRAND.location}
+            </span>
           </div>
         </div>
       </ArchitecturalSection>

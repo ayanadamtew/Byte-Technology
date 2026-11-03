@@ -8,16 +8,105 @@ import { BYTE_BRAND } from '../styles/tokens';
 
 export const HOMEPAGE_HERO = {
   kicker: 'Byte Technology · Ethiopia',
-  headline: 'Build smarter. Work better. Move Ethiopia forward.',
+  headline: 'Software that replaces your manual workflows.',
   mission: BYTE_BRAND.mission,
-  lead: 'Byte Technology partners with businesses and organizations across Ethiopia to replace fragmented, manual workflows with resilient web platforms, mobile applications, custom ERP systems, cloud infrastructure, and intelligent automation.',
+  lead: 'We build web platforms, mobile apps, ERP systems and cloud infrastructure for Ethiopian businesses, so your team stops chasing paper and spreadsheets.',
   primaryCta: {
-    label: 'Start a Project Conversation',
+    label: 'Book a free consultation',
     path: '/contact',
   },
   secondaryCta: {
-    label: 'Explore Our 7 Capabilities',
+    label: 'See what we build',
     href: '#capabilities-overview',
+  },
+} as const;
+
+export interface HeroValueProposition {
+  id: string;
+  text: string;
+  verified: boolean;
+  reviewFlag?: string;
+}
+
+/**
+ * Compact two-column value propositions below the hero CTA buttons.
+ * Per project truthfulness rules, only confirmed Byte Technology capabilities
+ * are presented as verified facts; unverified claims from the brief are
+ * explicitly flagged for review rather than published as facts.
+ */
+export const HERO_VALUE_PROPOSITIONS: readonly HeroValueProposition[] = [
+  {
+    id: 'built-in-ethiopia',
+    text: 'Built and supported in Ethiopia.',
+    verified: true,
+  },
+  {
+    id: 'seven-services',
+    text: '7 technology services, one team.',
+    verified: true,
+  },
+  {
+    id: 'end-to-end-delivery',
+    text: 'Custom software tailored to your operations.',
+    verified: true,
+  },
+  {
+    id: 'language-localization',
+    text: 'Interfaces in Amharic, Afan Oromo and English.',
+    verified: false,
+    reviewFlag: 'Flagged for review — unverified capability pending confirmation',
+  },
+] as const;
+
+export type WorkflowComparisonTabId = 'today' | 'with-byte';
+
+export interface WorkflowComparisonRow {
+  area: string;
+  value: string;
+  isMonospace?: boolean;
+}
+
+export interface WorkflowComparisonState {
+  id: WorkflowComparisonTabId;
+  tabLabel: string;
+  columnLeftHeader: string;
+  columnRightHeader: string;
+  rows: readonly WorkflowComparisonRow[];
+  summaryMessage: string;
+}
+
+export const HERO_WORKFLOW_COMPARISON: {
+  readonly disclaimer: string;
+  readonly states: Record<WorkflowComparisonTabId, WorkflowComparisonState>;
+} = {
+  disclaimer: 'Illustrative workflow comparison — not a verified client result.',
+  states: {
+    today: {
+      id: 'today',
+      tabLabel: 'Today',
+      columnLeftHeader: 'Business area',
+      columnRightHeader: 'Current problem',
+      rows: [
+        { area: 'Orders', value: 'Written in a notebook' },
+        { area: 'Stock', value: 'stock_final_v3.xlsx', isMonospace: true },
+        { area: 'Customers', value: 'Lost in WhatsApp chats' },
+        { area: 'Invoices', value: 'Paper, filed by hand' },
+      ],
+      summaryMessage: 'Month-end report: 3 days of manual work.',
+    },
+    'with-byte': {
+      id: 'with-byte',
+      tabLabel: 'With Byte',
+      columnLeftHeader: 'Business area',
+      columnRightHeader: 'Digital workflow',
+      rows: [
+        { area: 'Orders', value: 'Organized digital workflow.' },
+        { area: 'Stock', value: 'Centralized inventory management.' },
+        { area: 'Customers', value: 'Structured customer records.' },
+        { area: 'Invoices', value: 'Digital document management.' },
+      ],
+      summaryMessage: 'Less manual work. More control. Better business decisions.',
+    },
   },
 } as const;
 

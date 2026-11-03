@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   HOMEPAGE_HERO,
+  HERO_VALUE_PROPOSITIONS,
+  HERO_WORKFLOW_COMPARISON,
   HERO_SYSTEM_LAYERS,
   HOMEPAGE_SERVICES_BENTO,
   FEATURED_SOLUTION_BLUEPRINTS,
@@ -11,14 +13,70 @@ import {
   getBlueprintById,
 } from './homepage';
 
-test('Homepage hero preserves the exact requested headline and official mission', () => {
+test('Homepage hero preserves the exact requested headline, supporting text, CTAs, and official mission', () => {
   assert.equal(
     HOMEPAGE_HERO.headline,
-    'Build smarter. Work better. Move Ethiopia forward.'
+    'Software that replaces your manual workflows.'
   );
+  assert.equal(
+    HOMEPAGE_HERO.lead,
+    'We build web platforms, mobile apps, ERP systems and cloud infrastructure for Ethiopian businesses, so your team stops chasing paper and spreadsheets.'
+  );
+  assert.equal(HOMEPAGE_HERO.primaryCta.label, 'Book a free consultation');
+  assert.equal(HOMEPAGE_HERO.primaryCta.path, '/contact');
+  assert.equal(HOMEPAGE_HERO.secondaryCta.label, 'See what we build');
   assert.equal(
     HOMEPAGE_HERO.mission,
     'Our mission is simple: To Digitalize Ethiopia.'
+  );
+});
+
+test('Hero value propositions flag unverified claims for review instead of publishing them as confirmed facts', () => {
+  assert.equal(HERO_VALUE_PROPOSITIONS.length, 4);
+  const confirmed = HERO_VALUE_PROPOSITIONS.filter((item) => item.verified);
+  const flagged = HERO_VALUE_PROPOSITIONS.filter((item) => !item.verified);
+
+  assert.equal(confirmed.length, 3);
+  assert.equal(flagged.length, 1);
+  assert.equal(
+    flagged[0].text,
+    'Interfaces in Amharic, Afan Oromo and English.'
+  );
+  assert.ok(flagged[0].reviewFlag && flagged[0].reviewFlag.length > 0);
+});
+
+test('Hero workflow comparison defines Today and With Byte tabs with 4 rows each and illustrative disclaimer', () => {
+  assert.ok(HERO_WORKFLOW_COMPARISON.disclaimer.toLowerCase().includes('illustrative'));
+
+  const today = HERO_WORKFLOW_COMPARISON.states.today;
+  assert.equal(today.tabLabel, 'Today');
+  assert.equal(today.rows.length, 4);
+  assert.deepEqual(
+    today.rows.map((r) => [r.area, r.value]),
+    [
+      ['Orders', 'Written in a notebook'],
+      ['Stock', 'stock_final_v3.xlsx'],
+      ['Customers', 'Lost in WhatsApp chats'],
+      ['Invoices', 'Paper, filed by hand'],
+    ]
+  );
+  assert.equal(today.summaryMessage, 'Month-end report: 3 days of manual work.');
+
+  const withByte = HERO_WORKFLOW_COMPARISON.states['with-byte'];
+  assert.equal(withByte.tabLabel, 'With Byte');
+  assert.equal(withByte.rows.length, 4);
+  assert.deepEqual(
+    withByte.rows.map((r) => [r.area, r.value]),
+    [
+      ['Orders', 'Organized digital workflow.'],
+      ['Stock', 'Centralized inventory management.'],
+      ['Customers', 'Structured customer records.'],
+      ['Invoices', 'Digital document management.'],
+    ]
+  );
+  assert.equal(
+    withByte.summaryMessage,
+    'Less manual work. More control. Better business decisions.'
   );
 });
 
