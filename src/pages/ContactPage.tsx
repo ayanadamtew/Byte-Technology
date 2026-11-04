@@ -326,7 +326,7 @@ export function ContactPage() {
                     [CONTENT PLACEHOLDER: Official Office Address in Ethiopia — e.g., City / District / Building]
                   </p>
                   <p className="rounded border border-dashed border-[#1A2130]/25 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#525B6C]">
-                    [CONTENT PLACEHOLDER: Official Business Phone / WhatsApp / Telegram Contact Number]
+                    [CONTENT PLACEHOLDER: Official Business Phone / WhatsApp / Facebook Contact]
                   </p>
                 </div>
               </div>

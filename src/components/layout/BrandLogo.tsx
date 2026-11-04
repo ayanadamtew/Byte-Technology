@@ -17,7 +17,7 @@ export interface BrandLogoProps {
  */
 export function BrandLogo({
   tone = 'light',
-  showLocation = true,
+  showLocation = false,
   priority = false,
   className,
 }: BrandLogoProps) {
@@ -82,8 +82,8 @@ export function BrandLogo({
         {showLocation && (
           <span
             className={cn(
-              'mt-1 text-[11px] font-medium leading-none',
-              tone === 'light' ? 'text-[#525B6C]' : 'text-[#9BA6B8]'
+              'mt-1 font-mono text-[11px] leading-none tracking-[0.04em]',
+              tone === 'light' ? 'text-[#525B6C]' : 'text-[#B0B8C8]'
             )}
           >
             {BYTE_BRAND.location}

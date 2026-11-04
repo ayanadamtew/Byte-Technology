@@ -100,7 +100,7 @@ export function buildConsultationMailto(params?: {
 }
 
 export interface ByteSocialLink {
-  id: 'linkedin' | 'github' | 'x' | 'telegram';
+  id: 'linkedin' | 'github' | 'facebook';
   label: string;
   href: string;
 }
@@ -151,14 +151,9 @@ export function getVerifiedSocialLinks(
       raw: sourceEnv.VITE_SOCIAL_GITHUB_URL,
     },
     {
-      id: 'x',
-      label: 'X (Twitter)',
-      raw: sourceEnv.VITE_SOCIAL_X_URL,
-    },
-    {
-      id: 'telegram',
-      label: 'Telegram',
-      raw: sourceEnv.VITE_SOCIAL_TELEGRAM_URL,
+      id: 'facebook',
+      label: 'Facebook',
+      raw: sourceEnv.VITE_SOCIAL_FACEBOOK_URL,
     },
   ];
 

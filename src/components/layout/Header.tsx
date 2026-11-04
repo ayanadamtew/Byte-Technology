@@ -42,7 +42,7 @@ export function Header() {
           to="/"
           className="group rounded-md transition-transform duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FA8112] focus-visible:ring-offset-2"
         >
-          <BrandLogo tone="light" showLocation priority />
+          <BrandLogo tone="light" showLocation={false} priority />
         </Link>
 
         {/* Center: Primary Desktop Navigation Links with Shared Motion Hover & Active Indicators */}
